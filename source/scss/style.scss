@@ -25,7 +25,7 @@ main {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    padding: 2rem 0;
+    margin: 2rem 0;
     &#search {
       .inner_box {
         max-width: 350px;
@@ -66,6 +66,8 @@ main {
             height: 50px;
             width: 100%;
             padding: 0 10px;
+            border: 1px solid black;
+            border-radius: 0;
           }
           ul#results {
             position: absolute;
@@ -124,18 +126,62 @@ main {
       .inner_box {
         width: 100%;
         background-color: white;
-        padding: 3rem 0;
+        // padding: 3rem 0;
         max-width: 1600px;
         .spellsheet_wrapper {
-          #spells {
+          h2 {
+            font-size: 1.8rem;
+            margin: 1.5rem 0 0.5rem;
+          }
+          .spells {
             padding: 0;
             display: grid;
             grid-gap: 1.5rem;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            grid-template-columns: 1fr 1fr 1fr;
+            @media only screen and (max-width: 1200px) {
+              grid-template-columns: 1fr 1fr;
+            }
+            @media only screen and (max-width: 800px) {
+              grid-template-columns: 1fr;
+            }
             .spell {
               list-style: none;
               padding: 1.5rem;
               border: black 1px solid;
+              position: relative;
+              a.remove_spell {
+                // width: 40px;
+                // height: 40px;
+                position: absolute;
+                top: 1.5rem;
+                right: 1.5rem;
+                z-index: 2;
+                text-decoration: none;
+                color: black;
+                display: none;
+                i {
+                  font-size: 1.5rem;
+                }
+                span {
+                  vertical-align: text-bottom;
+                  margin-right: 0.25rem;
+                  transition: .3s;
+                  width: 0;
+                  overflow: hidden;
+                  display: inline-block;
+                  white-space: nowrap;
+                }
+                &:hover {
+                  span {
+                    width: 95px;
+                  }
+                }
+              }
+              &:hover {
+                a.remove_spell {
+                  display: block;
+                }
+              }
               &:only-child {
                 max-width: 600px;
               }
@@ -213,10 +259,10 @@ main {
                       display: inline-block;
                       color: grey;
                       font-size: 0.8rem;
-                      margin-right: .5rem;
+                      margin-right: 0.5rem;
                       vertical-align: text-bottom;
                       border: 1px solid grey;
-                      padding: 0 .3rem 0 .2rem;
+                      padding: 0 0.3rem 0 0.2rem;
                       i {
                         // font-size: 1.3rem;
                         margin-right: 0.2rem;
@@ -226,6 +272,12 @@ main {
                   }
                 }
               }
+            }
+            li {
+              list-style: none;
+            }
+            ul {
+              padding: 0;
             }
           }
         }

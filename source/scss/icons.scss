@@ -1,51 +1,12 @@
-.icon {
-  display: inline-block;
-  background-color: black;
-  &.zoom {
-    mask: url(../../img/icons/zoom.svg) no-repeat center;
-  }
-  &.book {
-    mask: url(../../img/icons/book.svg) no-repeat center;
-  }
-  &.arrow-right {
-    mask: url(../../img/icons/arrow-right.svg) no-repeat center;
-  }
-  &.arrow-left {
-    mask: url(../../img/icons/arrow-right.svg) no-repeat center;
-    transform: rotate(180deg);
-  }
-  &.play {
-    mask: url(../../img/icons/play.svg) no-repeat center;
-  }
-  &.pause {
-    mask: url(../../img/icons/pause.svg) no-repeat center;
-  }
-  &.reset {
-    mask: url(../../img/icons/reset.svg) no-repeat center;
-  }
-  &.chevron-right {
-    mask: url(../../img/icons/chevron-right.svg) no-repeat center;
-  }
-  &.cart {
-    mask: url(../../img/icons/cart.svg) no-repeat center;
-  }
-  &.cross {
-    mask: url(../../img/icons/cross.svg) no-repeat center;
-  }
-  &.spotify {
-    mask: url(../../img/icons/spotify.svg) no-repeat center;
+i {
+  // display: inline-block;
+  // background-color: black;
+  &.pray {
+    mask: url(../../img/icons/pray.svg) no-repeat center;
     mask-size: contain;
-  }
-  &.apple {
-    mask: url(../../img/icons/apple.svg) no-repeat center;
-    mask-size: contain;
-  }
-  &.amazon {
-    mask: url(../../img/icons/amazon.svg) no-repeat center;
-    mask-size: contain;
-  }
-  &.gift {
-    mask: url(../../img/icons/gift.svg) no-repeat center;
-    mask-size: contain;
+    width: 19px;
+    height: 19px;
+    display: inline-block;
+    background-color: black;
   }
 }

@@ -4,7 +4,6 @@
 // });
 // const masterList = masterList.default;
 
-
 // const names = [];
 // fetch("../spells.json")
 //   .then((res) => res.json())
@@ -15,21 +14,21 @@
 var searchBox = document.getElementById("spellsearch");
 var resultsContainer = document.getElementById("results");
 var loadingAnimation = document.getElementById("loading");
-var spellList = document.getElementById("spells");
-
-// console.log(JSON.parse(localStorage.activeSpells));
-const activeSpells = []
+var spellLists = document.querySelectorAll("ul.spells");
+hideShowLevels();
+var activeSpells = [];
 if (localStorage.activeSpells) {
   const activeSpells = JSON.parse(localStorage.activeSpells);
+  console.log(activeSpells);
   activeSpells.forEach((e) => {
     addToSheet(e);
-  })
+  });
 }
 
-document.querySelector('#clear').addEventListener('click', () => {
-  localStorage.setItem("activeSpells", '');
-   location.reload();
-})
+document.querySelector("#clear").addEventListener("click", () => {
+  localStorage.setItem("activeSpells", "");
+  location.reload();
+});
 
 function debounce(callback, wait) {
   let timeout;
@@ -40,15 +39,24 @@ function debounce(callback, wait) {
     }, wait);
   };
 }
-var counter = -1
+var counter = -1;
 function createResult(e, val) {
-  counter++
+  counter++;
   const result = document.createElement("li");
   result.innerHTML =
-    "<a href='#' data-index='"+val[counter]+"' data-slug='" + e.slug + "'><h3>" + e.name + "</h3><p>" + e.type + "</p></a>";
+    "<a href='#' data-index='" +
+    val[counter] +
+    "' data-slug='" +
+    e.slug +
+    "'><h3>" +
+    e.name +
+    "</h3><p>" +
+    e.type +
+    "</p></a>";
   resultsContainer.appendChild(result);
   result.addEventListener("click", () => {
     addToSheet(e);
+    searchBox.value = "";
   });
 }
 
@@ -60,105 +68,142 @@ function bindCloseResultsContainer(e) {
   });
 }
 
-
-
 function addToSheet(e) {
-  console.log(e)
-  activeSpells.push(e);
-  const spell = document.createElement("li");
-  if (e.casting_time === "1 bonus action") {
-    var castingTime = "1 bns";
-  }
-  if (e.description.includes("failed save") || e.description.includes("saving throw")) {
-    var savingThrow = "yes";
+  // console.log(e)
+  if (activeSpells.some((item) => item.name === e.name)) {
+    window.alert("This spell is already in your spellbook!");
   } else {
-    var savingThrow = "no";
-  }
-  if (e.description.includes("spell attack")) {
-    var spellAttack = "yes";
-  } else {
-    var spellAttack = "no";
-  }
-  if (e.higher_levels) {
-    var higherLevel =
-      '<p class="higher-level"><span><i class="ai-arrow-up-thick" title="Higher level"></i>upcast</span>' +
-      e.higher_levels +
-      "</p>";
-  } else {
-    var higherLevel = "";
-  }
-  if (e.components.materials_needed) {
-    var materialsNeeded =
-      '<li class="material hidden"><p><i title="material" class="ai-shipping-box-v1"></i>' +
-      e.components.materials_needed +
-      "</p></li>";
-  } else {
-    var materialsNeeded = ''
-  }
-  if (e.ritual === true) {
-    var ritual = 'yes'
-  } else {
-    var ritual = 'no'
-  }
-  var components = []
-  if (e.components.verbal === true) {
-    components.push('V')
-  }
-  if (e.components.somatic === true) {
-    components.push('S')
-  }
-  if (e.components.materials_needed) {
-    components.push('M')
-  }
-  if (components.length > 0) {
-    var componentsString = components.join(', ');
-  }
+    activeSpells.push(e);
+    const spell = document.createElement("li");
+    if (e.casting_time === "1 bonus action") {
+      var castingTime = "1 bns";
+    }
+    if (e.description.includes("failed save") || e.description.includes("saving throw")) {
+      var savingThrow = "yes";
+    } else {
+      var savingThrow = "no";
+    }
+    if (e.description.includes("spell attack")) {
+      var spellAttack = "yes";
+    } else {
+      var spellAttack = "no";
+    }
+    if (e.higher_levels) {
+      var higherLevel =
+        '<p class="higher-level"><span><i class="ai-arrow-up-thick" title="Higher level"></i>upcast</span>' +
+        e.higher_levels +
+        "</p>";
+    } else {
+      var higherLevel = "";
+    }
+    if (e.components.materials_needed) {
+      var materialsNeeded =
+        '<li class="material hidden"><p><i title="material" class="ai-shipping-box-v1"></i>' +
+        e.components.materials_needed +
+        "</p></li>";
+    } else {
+      var materialsNeeded = "";
+    }
+    if (e.ritual === true) {
+      var ritual = "yes";
+    } else {
+      var ritual = "no";
+    }
+    var components = [];
+    if (e.components.verbal === true) {
+      components.push("V");
+    }
+    if (e.components.somatic === true) {
+      components.push("S");
+    }
+    if (e.components.materials_needed) {
+      components.push("M");
+    }
+    if (components.length > 0) {
+      var componentsString = components.join(", ");
+    }
 
-  var castingTime = e.casting_time;
-  spell.classList.add("spell");
-  spell.setAttribute("data-time", castingTime);
-  spell.setAttribute("data-range", e.range);
-  spell.setAttribute("data-duration", e.duration);
-  if (e.level === "cantrip") {
-    spell.setAttribute("data-level", e.level);
-  } else {
-    spell.setAttribute("data-level", e.level.replace(/\D/g, ""));
-  }
+    var castingTime = e.casting_time;
+    spell.classList.add("spell");
+    spell.setAttribute("data-time", castingTime);
+    spell.setAttribute("data-name", e.name);
+    spell.setAttribute("data-range", e.range);
+    spell.setAttribute("data-duration", e.duration);
+    if (e.level === "cantrip") {
+      spell.setAttribute("data-level", e.level);
+    } else {
+      spell.setAttribute("data-level", e.level.replace(/\D/g, ""));
+    }
 
-  spell.innerHTML =
-    '<div class="spell_inner"><h3><i class="ai-fire" title="' +
-    e.school +
-    '"></i>' +
-    e.name +
-    '</h3><ul class="terms large"><li class="casting-time"><p><i title="casting time" class="ai-thunder"></i>' +
-    castingTime +
-    '</p></li><li class="range"><p><i title="range" class="ai-arrow-up-right"></i>' +
-    e.range +
-    '</p></li><li class="duration"><p><i title="duration" class="ai-clock"></i>' +
-    e.duration +
-    '</p></li></ul><ul class="terms small"><li class="school"><p><i title="school" class="ai-book-close"></i>' +
-    e.school +
-    '</p></li><li class="save"><p><i title="save" class="ai-lifesaver"></i>' +
-    savingThrow +
-    '</p></li><li class="spell-attack"><p><i title="spell attack" class="ai-sword"></i>' +
-    spellAttack +
-    '</p></li><li class="components hidden"><p><i title="components" class="ai-language"></i>' +
-    componentsString +
-    '</p></li>'+materialsNeeded+'<li class="ritual"><p><i title="ritual" class="ai-sparkles"></i>' +
-    ritual +
-    "</p></li></ul><p>" +
-    e.description +
-    "</p>" +
-    higherLevel +
-    "</div>";
-    
-  spellList.appendChild(spell);
-  localStorage.setItem("activeSpells", (JSON.stringify(activeSpells)));
+    spell.innerHTML =
+      '<div class="spell_inner"><a href="#" class="remove_spell"><span>Remove spell</span><i class="ai-cross"></i></a><h3><i class="ai-fire" title="' +
+      e.school +
+      '"></i>' +
+      e.name +
+      '</h3><ul class="terms large"><li class="casting-time"><p><i title="casting time" class="ai-thunder"></i>' +
+      castingTime +
+      '</p></li><li class="range"><p><i title="range" class="ai-arrow-up-right"></i>' +
+      e.range +
+      '</p></li><li class="duration"><p><i title="duration" class="ai-clock"></i>' +
+      e.duration +
+      '</p></li></ul><ul class="terms small"><li class="school"><p><i title="school" class="ai-book-close"></i>' +
+      e.school +
+      '</p></li><li class="save"><p><i title="save" class="ai-lifesaver"></i>' +
+      savingThrow +
+      '</p></li><li class="spell-attack"><p><i title="spell attack" class="ai-sword"></i>' +
+      spellAttack +
+      '</p></li><li class="components hidden"><p><i title="components" class="ai-language"></i>' +
+      componentsString +
+      "</p></li>" +
+      materialsNeeded +
+      '<li class="ritual"><p><i title="ritual" class="pray"></i>' +
+      ritual +
+      "</p></li></ul><p>" +
+      e.description +
+      "</p>" +
+      higherLevel +
+      "</div>";
+    if (e.level === "cantrip") {
+      var spellLevel = 0;
+    } else {
+      var spellLevel = e.level;
+    }
+
+    spellLists[spellLevel].appendChild(spell);
+    localStorage.setItem("activeSpells", JSON.stringify(activeSpells));
+    hideShowLevels();
+    bindRemoveSpell(spell);
+  }
 }
-///////////////TESTING///////////////
-// var query = "blade";
-// fetchSpells(query);
-///////////////TESTING///////////////
+
+function bindRemoveSpell(e) {
+  e.addEventListener("click", () => {
+    var thisName = e.getAttribute("data-name");
+    // activeSpells.forEach((e, index) => {
+    //   if (e.name.includes(thisName)) {
+    //     var removed = activeSpells.splice(index, index);
+    //   }
+    // });
+    var result = activeSpells.filter((x) => x.name !== thisName);
+    activeSpells = result;
+    localStorage.setItem("activeSpells", JSON.stringify(activeSpells));
+    e.remove();
+    hideShowLevels();
+  });
+}
+
+function hideShowLevels() {
+  spellLists.forEach((e) => {
+    if (e.childNodes.length > 0) {
+      e.style.display = "grid";
+      e.previousElementSibling.style.display = "block";
+    } else {
+      e.style.display = "none";
+      e.previousElementSibling.style.display = "none";
+    }
+  });
+}
+
 searchBox.addEventListener("input", (e) => {
   if (searchBox.value.length > 0) {
     loadingAnimation.classList.add("active");
@@ -178,45 +223,43 @@ searchBox.addEventListener(
     }
   }, 600)
 );
-searchBox.addEventListener("click", () => {
-  if (resultsContainer.firstChild) {
-    resultsContainer.classList.add("open");
-  }
-});
-
-
+// searchBox.addEventListener("click", () => {
+//   if (resultsContainer.firstChild) {
+//     resultsContainer.classList.add("open");
+//   }
+// });
 
 function fetchSpells(query) {
-    fetch("../spells.json")
-      .then((res) => res.json())
-      .then((data) => {
-        // let results = data.filter((x, index) => x.name.toLowerCase().includes(query.toLowerCase()));
-        let results = []
-        let resultsIndex = []
-        data.forEach((e, index) => {
-          if (e.name.toLowerCase().includes((query.toLowerCase()))) {
-            results.push(e)
-            resultsIndex.push(index)
-          }
-        })
-        if (results.length > 0) {
-          results.forEach((e, index) => {
-            createResult(e, resultsIndex);
-          });
-          loadingAnimation.classList.remove("active");
-          resultsContainer.classList.add("open");
-          bindCloseResultsContainer();
-        } else {
-          resultsContainer.innerHTML = "<li><p>No results</p></li>";
-          loadingAnimation.classList.remove("active");
-          resultsContainer.classList.add("open");
-          bindCloseResultsContainer();
+  fetch("../spells.json")
+    .then((res) => res.json())
+    .then((data) => {
+      // let results = data.filter((x, index) => x.name.toLowerCase().includes(query.toLowerCase()));
+      let results = [];
+      let resultsIndex = [];
+      data.forEach((e, index) => {
+        if (e.name.toLowerCase().includes(query.toLowerCase())) {
+          results.push(e);
+          resultsIndex.push(index);
         }
-      })
-      .catch(function (err) {
-        // There was an error
-        console.warn("Something went wrong.", err);
       });
+      if (results.length > 0) {
+        results.forEach((e, index) => {
+          createResult(e, resultsIndex);
+        });
+        loadingAnimation.classList.remove("active");
+        resultsContainer.classList.add("open");
+        bindCloseResultsContainer();
+      } else {
+        resultsContainer.innerHTML = "<li><p>No results</p></li>";
+        loadingAnimation.classList.remove("active");
+        resultsContainer.classList.add("open");
+        bindCloseResultsContainer();
+      }
+    })
+    .catch(function (err) {
+      // There was an error
+      console.warn("Something went wrong.", err);
+    });
   // var fetchUrl = "https://api.open5e.com/spells/?search=" + i;
   // fetch(fetchUrl)
   //   .then(function (response) {
@@ -245,34 +288,31 @@ function fetchSpells(query) {
   //   });
 }
 
-document.querySelector('button').addEventListener('click', () => {
+document.querySelector("button").addEventListener("click", () => {
   downloadFile();
-})
+});
 
 function downloadFile() {
   let a = document.createElement("a");
-  if (typeof a.download !== "undefined") a.download = 'spellbook.json';
+  if (typeof a.download !== "undefined") a.download = "spellbook.json";
   a.href = URL.createObjectURL(
     new Blob([JSON.stringify(activeSpells)], {
       type: "application/octet-stream",
     })
   );
   a.dispatchEvent(new MouseEvent("click"));
-    
+
   const reader = new FileReader();
 
+  // var json = JSON.stringify(activeSpells);
+  // var blob = new Blob([json], { type: "application/json" });
+  // var url = URL.createObjectURL(blob);
 
-    // var json = JSON.stringify(activeSpells);
-    // var blob = new Blob([json], { type: "application/json" });
-    // var url = URL.createObjectURL(blob);
-
-    // var a = document.createElement("a");
-    // a.download = "backup.json";
-    // a.href = url;
-    // a.textContent = "Download backup.json";
-    // document.body.appendChild(a);
-
-  
+  // var a = document.createElement("a");
+  // a.download = "backup.json";
+  // a.href = url;
+  // a.textContent = "Download backup.json";
+  // document.body.appendChild(a);
 }
 
 // const spellNames = [
@@ -661,5 +701,5 @@ function downloadFile() {
 // console.log(results)
 
 // searchFunction() {
-  
+
 // }
