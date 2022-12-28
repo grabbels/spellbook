@@ -1,0 +1,25 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  font-display: fallback;
+}
+
+$red: #EB595C;
+$blue: #232350;
+$yellow: #FDEA58;
+$brown: #423B18;
+$pink: #FDE9E7;
+$green: #08595B;
+// :root {
+//   --red: #EB595C;
+//   --blue: #232350;
+//   --yellow: #FDEA58;
+//   --brown: #423B18;
+//   --pink: #FDE9E7;
+//   --green: #08595B;
+// }
+$header: 'recoleta', serif;
+$body: 'Quicksand', sans-serif;
+
+$mobile-margin: 5vw;

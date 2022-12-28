@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inky's Tentacletastic Spellbook</title>
+    <!-- <link rel="icon" href="/img/favicon.png" type="image/x-icon" /> -->
+    <!-- <link rel="shortcut icon" href="/img/favicon.png" type="image/x-icon" /> -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="compiled/css/style.min.css" />
+    <script src="https://unpkg.com/akar-icons-fonts"></script>
+  </head>
+
+  <body>
+    <button>Save spellbook</button>
+    <button id="clear">Clear all</button>
+    <!-- <form action="/upload" enctype="multipart/form-data" method="post">
+    <input type="file" name="filename"><br>
+    <button>Upload</button> -->
+    <input type="file" id="file">
+<script>
+  const $input = document.querySelector('#file');
+  $input.addEventListener('change', event => {
+    const data = new FormData();
+    data.append('file', event.target.files[0]);
+    fetch('/upload', {
+      method: 'post',
+      body: data
+    }).then(res => res.text()).then(res => {
+      const log = document.createElement('p');
+      log.innerHTML = res;
+      document.body.appendChild(log);
+    })
+  })
+</script>
+</form>
+    <main>
+      <div class="outer_box" id="title">
+        <div class="inner_box">
+          <h1><i class="ai-book-open"></i> Inky's Tentacletastic Spellbook</h1>
+        </div>
+      </div>
+      <div class="outer_box" id="search">
+        <div class="inner_box">
+          <div class="search_wrapper">
+            <input type="text" id="spellsearch" placeholder="Add spells..." />
+            <ul id="results"></ul>
+            <div id="loading"></div>
+          </div>
+        </div>
+      </div>
+      <div class="outer_box" id="spellsheet">
+        <div class="inner_box">
+          <div class="spellsheet_wrapper">
+            <ul id="spells"></ul>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script type="module" src="scripts.js"></script>
+  </body>
+</html>
