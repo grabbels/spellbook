@@ -15,19 +15,55 @@ var searchBox = document.getElementById("spellsearch");
 var resultsContainer = document.getElementById("results");
 var loadingAnimation = document.getElementById("loading");
 var spellLists = document.querySelectorAll("ul.spells");
-hideShowLevels();
+var prefsButton = document.getElementById("visual_prefs_button");
+var prefsPanel = document.getElementById("visual_prefs_panel");
+var darkButton = document.getElementById("dark_mode");
+
+if (localStorage.darkMode === "true") {
+  darkButton.classList.toggle("active");
+  document.documentElement.classList.toggle("dark");
+  resultsContainer.classList.toggle("dark");
+}
+
+prefsButton.addEventListener("click", () => {
+  prefsButton.classList.toggle("active");
+  window.document.addEventListener("click", (e) => {
+    if (!e.target.closest("#visual_prefs_panel")) {
+      // prefsButton.classList.remove("active");
+      // window.document.addEventListener('click', (), false)
+    }
+  });
+});
+
+darkButton.addEventListener("click", () => {
+  darkButton.classList.toggle("active");
+  document.documentElement.classList.toggle("dark");
+  resultsContainer.classList.toggle("dark");
+  if (document.documentElement.classList.contains("dark")) {
+    localStorage.setItem("darkMode", "true");
+  } else {
+    localStorage.setItem("darkMode", "false");
+  }
+});
+
 var activeSpells = [];
 if (localStorage.activeSpells) {
   const activeSpells = JSON.parse(localStorage.activeSpells);
-  console.log(activeSpells);
+  // console.log(activeSpells);
   activeSpells.forEach((e) => {
     addToSheet(e);
   });
+  checkUpDownSetOrder();
 }
 
+hideShowLevels();
+
 document.querySelector("#clear").addEventListener("click", () => {
-  localStorage.setItem("activeSpells", "");
-  location.reload();
+  let text = "Are you sure you want to remove all your saved spells?";
+  if (confirm(text) == true) {
+    localStorage.setItem("activeSpells", "");
+    location.reload();
+  }
 });
 
 function debounce(callback, wait) {
@@ -43,16 +79,7 @@ var counter = -1;
 function createResult(e, val) {
   counter++;
   const result = document.createElement("li");
-  result.innerHTML =
-    "<a href='#' data-index='" +
-    val[counter] +
-    "' data-slug='" +
-    e.slug +
-    "'><h3>" +
-    e.name +
-    "</h3><p>" +
-    e.type +
-    "</p></a>";
+  result.innerHTML = "<a href='#' data-index='" + val[counter] + "' data-slug='" + e.slug + "'><h3>" + e.name + "</h3><p>" + e.type + "</p></a>";
   resultsContainer.appendChild(result);
   result.addEventListener("click", () => {
     addToSheet(e);
@@ -89,18 +116,12 @@ function addToSheet(e) {
       var spellAttack = "no";
     }
     if (e.higher_levels) {
-      var higherLevel =
-        '<p class="higher-level"><span><i class="ai-arrow-up-thick" title="Higher level"></i>upcast</span>' +
-        e.higher_levels +
-        "</p>";
+      var higherLevel = '<p class="higher-level"><span><i class="ai-arrow-up-thick" title="Higher level"></i>upcast</span>' + e.higher_levels + "</p>";
     } else {
       var higherLevel = "";
     }
     if (e.components.materials_needed) {
-      var materialsNeeded =
-        '<li class="material hidden"><p><i title="material" class="ai-shipping-box-v1"></i>' +
-        e.components.materials_needed +
-        "</p></li>";
+      var materialsNeeded = '<li class="material hidden"><p><i title="material" class="ai-shipping-box-v1"></i>' + e.components.materials_needed + "</p></li>";
     } else {
       var materialsNeeded = "";
     }
@@ -136,7 +157,7 @@ function addToSheet(e) {
     }
 
     spell.innerHTML =
-      '<div class="spell_inner"><a href="#" class="remove_spell"><span>Remove spell</span><i class="ai-cross"></i></a><h3><i class="ai-fire" title="' +
+      '<div class="spell_inner"><div class="controls"><a href="#" class="moveup_spell"><span>Move spell up</span><i class="ai-chevron-up"></i></a><a href="#" class="movedown_spell"><span>Move spell down</span><i class="ai-chevron-down"></i></a><a href="#" class="remove_spell"><span>Remove spell</span><i class="ai-cross"></i></a></div><h3><i class="ai-fire" title="' +
       e.school +
       '"></i>' +
       e.name +
@@ -168,29 +189,72 @@ function addToSheet(e) {
     } else {
       var spellLevel = e.level;
     }
-
+    
     spellLists[spellLevel].appendChild(spell);
+    console.log(activeSpells);
     localStorage.setItem("activeSpells", JSON.stringify(activeSpells));
     hideShowLevels();
-    bindRemoveSpell(spell);
+    bindRemoveMoveSpell(spell);
   }
 }
 
-function bindRemoveSpell(e) {
-  e.addEventListener("click", () => {
+// function attachOrder() {
+
+// }
+
+function bindRemoveMoveSpell(e) {
+  e.querySelector(".remove_spell").addEventListener("click", () => {
+    event.preventDefault();
     var thisName = e.getAttribute("data-name");
-    // activeSpells.forEach((e, index) => {
-    //   if (e.name.includes(thisName)) {
-    //     var removed = activeSpells.splice(index, index);
-    //   }
-    // });
     var result = activeSpells.filter((x) => x.name !== thisName);
     activeSpells = result;
+
     localStorage.setItem("activeSpells", JSON.stringify(activeSpells));
     e.remove();
     hideShowLevels();
   });
+  e.querySelector(".movedown_spell").addEventListener("click", () => {
+    event.preventDefault();
+    e.parentNode.insertBefore(e.nextElementSibling, e);
+    checkUpDownSetOrder();
+  });
+  e.querySelector(".moveup_spell").addEventListener("click", () => {
+    event.preventDefault();
+    e.parentNode.insertBefore(e, e.previousElementSibling);
+    checkUpDownSetOrder();
+  });
 }
+
+function checkUpDownSetOrder() {
+  document.querySelectorAll(".spell").forEach((e) => {
+    if (e.nextElementSibling) {
+      e.querySelector(".movedown_spell").style.display = "inline-block";
+    } else {
+      e.querySelector(".movedown_spell").style.display = "none";
+    }
+    if (e.previousElementSibling) {
+      e.querySelector(".moveup_spell").style.display = "inline-block";
+    } else {
+      e.querySelector(".moveup_spell").style.display = "none";
+    }
+    var index = Array.prototype.indexOf.call(e.parentNode.children, e);
+    var level = e.getAttribute("data-level").replace("cantrip", "0");
+    e.setAttribute("data-order", level + "-" + index);
+  });
+  // saveOrder();
+}
+
+// function saveOrder() {
+//   const activeSpellsOrder = [];
+//   document.querySelectorAll(".spell").forEach((e) => {
+//     var name = e.getAttribute("data-name");
+//     var index = e.getAttribute("data-order");
+//     // console.log(name +' - '+ index
+//     activeSpellsOrder.push({ index, name });
+//   });
+//   console.log(activeSpellsOrder);
+//   localStorage.setItem("activeSpellsOrder", JSON.stringify(activeSpellsOrder));
+// }
 
 function hideShowLevels() {
   spellLists.forEach((e) => {

@@ -16,29 +16,50 @@
   </head>
 
   <body>
-    <button>Save spellbook</button>
-    <button id="clear">Clear all</button>
-    <!-- <form action="/upload" enctype="multipart/form-data" method="post">
-    <input type="file" name="filename"><br>
-    <button>Upload</button> -->
-    <input type="file" id="file">
-<script>
-  const $input = document.querySelector('#file');
-  $input.addEventListener('change', event => {
-    const data = new FormData();
-    data.append('file', event.target.files[0]);
-    fetch('/upload', {
-      method: 'post',
-      body: data
-    }).then(res => res.text()).then(res => {
-      const log = document.createElement('p');
-      log.innerHTML = res;
-      document.body.appendChild(log);
-    })
-  })
-</script>
-</form>
+    <!-- <script>
+      const $input = document.querySelector("#file");
+      $input.addEventListener("change", (event) => {
+        const data = new FormData();
+        data.append("file", event.target.files[0]);
+        fetch("/upload", {
+          method: "post",
+          body: data,
+        })
+          .then((res) => res.text())
+          .then((res) => {
+            const log = document.createElement("p");
+            log.innerHTML = res;
+            document.body.appendChild(log);
+          });
+      });
+    </script> -->
+
     <main>
+      <div class="outer_box" id="header">
+        <div class="inner_box">
+          <div class="header_left">
+            <button>Save spellbook</button>
+            <button id="clear">Clear all</button>
+            <!-- <form action="/upload" enctype="multipart/form-data" method="post">
+            <input type="file" name="filename"><br>
+            <button>Upload</button>
+          </form> -->
+            <input type="file" id="file" />
+          </div>
+          <div class="header_right">
+            <div class="visual_prefs">
+              <a class="menu_button" id="visual_prefs_button" title="Visual preferences" href="#"><i class="ai-sun"></i></a>
+              <div id="visual_prefs_panel">
+                <ul>
+                  <li><a href="#" title="Enable dark mode" id="dark_mode"><i class="ai-moon"></i>Dark mode</a></li>
+                  <li></li>
+                  <li></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="outer_box" id="title">
         <div class="inner_box">
           <h1><i class="ai-book-open"></i> Inky's Tentacletastic Spellbook</h1>
