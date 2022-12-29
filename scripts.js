@@ -21,6 +21,7 @@ var prefsPanel = document.getElementById("visual_prefs_panel");
 var darkButton = document.getElementById("dark_mode");
 var brightnessSlider = document.getElementById("brightness");
 var contrastSlider = document.getElementById("contrast");
+var headerLeft = document.querySelector("#header .header_left");
 
 //////////CHECK FOR VISUAL SETTINGS IN LOCALSTORAGE AND SET THEM///////
 if (localStorage.darkMode === "true") {
@@ -199,8 +200,8 @@ function addToSheet(e) {
       var icon = "";
   }
 
-  var description = e.description.replace('/n/n', '</p><p>')
-  console.log(description)
+  var description = e.description.replace("/n/n", "</p><p>");
+  // console.log(description)
 
   spell.innerHTML =
     '<div class="spell_inner"><div class="controls"><a href="#" class="moveup_spell"><span>Move spell up</span><i class="ri-arrow-up-s-line"></i></a><a href="#" class="movedown_spell"><span>Move spell down</span><i class="ri-arrow-down-s-line"></i></a><a href="#" class="remove_spell"><span>Remove spell</span><i class="ri-close-line"></i></a></div><h3><i class="' +
@@ -219,7 +220,7 @@ function addToSheet(e) {
     e.school +
     '</p></li><li class="save"><p><i title="save" class="ri-lifebuoy-line"></i>' +
     savingThrow +
-    '</p></li><li class="spell-attack"><p><i title="spell attack" class="ri-sword-fill"></i>' +
+    '</p></li><li class="spell-attack"><p><i title="spell attack" class="ri-sword-line"></i>' +
     spellAttack +
     '</p></li><li class="components hidden"><p><i title="components" class="ri-voiceprint-line"></i>' +
     componentsString +
@@ -227,7 +228,7 @@ function addToSheet(e) {
     materialsNeeded +
     '<li class="ritual"><p><i title="ritual" class="ri-open-arm-line"></i>' +
     ritual +
-    "</p></li></ul><p>" +
+    "</p></li></ul><p class='padding: 0.435rem 0.6rem;'>" +
     description +
     "</p>" +
     higherLevel +
@@ -421,7 +422,7 @@ function downloadFile() {
   const activeSpellsHtml = localStorage.activeSpells;
   let a = document.createElement("a");
   var name = prompt("Filename:");
-  if (typeof a.download !== "undefined") a.download = name +".ink";
+  if (typeof a.download !== "undefined") a.download = name + ".ink";
   a.href = URL.createObjectURL(
     new Blob([activeSpellsHtml], {
       type: "application/octet-stream",
@@ -464,6 +465,88 @@ function readFileContent(file) {
     reader.readAsText(file);
   });
 }
+
+////////////////FILTERS////////////////////////////////////////
+const activeFilters = [];
+let filters = document.querySelectorAll("#filters .filter a");
+filters.forEach((e) => {
+  e.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (event.target.classList.contains("active")) {
+      event.target.classList.remove("active");
+      deactivateFilter(event.target);
+    } else {
+      event.target.classList.add("active");
+      if (event.target.parentNode.children.length > 2) {
+        Array.prototype.forEach.call(event.target.parentNode.children, (i) => {
+          if (i !== event.target) {
+            i.classList.remove("active");
+            var filterCategory = i.parentNode.getAttribute("data-filter");
+            var activeFilter = i.getAttribute("data-" + filterCategory);
+            var index = activeFilters.indexOf(activeFilter);
+            if (index > -1) {
+              activeFilters.splice(index, 1);
+            }
+            console.log(activeFilters);
+            filterSpells();
+          } 
+        });
+      }
+      activateFilter(event.target);
+      disableFeatures();
+      document.getElementById("remove-filters").classList.add("active");
+    }
+  });
+});
+
+function activateFilter() {
+  var filterCategory = event.target.parentNode.getAttribute("data-filter");
+  var activeFilter = event.target.getAttribute("data-" + filterCategory);
+  activeFilters.push(activeFilter);
+  filterSpells();
+}
+
+function deactivateFilter() {
+  var filterCategory = event.target.parentNode.getAttribute("data-filter");
+  var activeFilter = event.target.getAttribute("data-" + filterCategory);
+  var index = activeFilters.indexOf(activeFilter);
+  if (index > -1) {
+    activeFilters.splice(index, 1);
+  }
+  console.log(activeFilters);
+  filterSpells();
+  if (activeFilters.length < 1) {
+    enableFeatures();
+    document.getElementById("remove-filters").classList.remove("active");
+  }
+}
+
+function filterSpells() {
+  document.querySelectorAll(".spell").forEach((e) => {
+    if (activeFilters.length < 1) {
+      e.classList.remove("filter-hidden");
+    } else {
+      
+      var elementData = JSON.stringify(e.dataset);
+      if (!activeFilters.every((i) => elementData.includes(i))) {
+        e.classList.add("filter-hidden");
+      } else {
+        e.classList.remove("filter-hidden");
+      }
+    }
+  });
+}
+
+function disableFeatures() {
+  headerLeft.classList.add("disabled");
+  searchBox.classList.add("disabled");
+}
+function enableFeatures() {
+  headerLeft.classList.remove("disabled");
+  searchBox.classList.remove("disabled");
+}
+
+///////////////////////////////////////////////////////////////
 
 // const spellNames = [
 //   "Acid Splash",

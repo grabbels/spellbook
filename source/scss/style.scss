@@ -10,6 +10,10 @@
 * {
   box-sizing: border-box;
   font-family: "Roboto", sans-serif;
+  &.disabled {
+    opacity: 0.25;
+    pointer-events: none;
+  }
 }
 
 h3 {
@@ -44,14 +48,14 @@ main {
         .header_left {
           display: flex;
           height: auto;
-          gap: .5rem;
+          gap: 0.5rem;
           button,
           label {
             background-color: transparent;
             border: 1px solid black;
             border-radius: 0;
             display: inline-block;
-            padding: .4rem .6rem;
+            padding: 0.4rem 0.6rem;
             height: 38px;
             cursor: pointer;
             i {
@@ -224,6 +228,79 @@ main {
     }
     &#filters {
       margin-bottom: 0;
+      .inner_box {
+        width: 100%;
+        display: flex;
+        justify-content: right;
+        flex-wrap: wrap;
+        h3 {
+          width: 100%;
+          text-align: right;
+        }
+        ul.filters {
+          list-style: 0;
+          padding: 0;
+          display: flex;
+          gap: 0.5rem;
+          margin-right: -0.5rem;
+          li.filter,
+          li.remove-filters,
+          input {
+            font-size: 1rem;
+            background-color: transparent;
+            border: 1px solid black;
+            display: inline-block;
+            input {
+              border: none;
+              height: 100%;
+              width: 100%;
+              padding: 0.435rem 0.6rem;
+            }
+            i {
+              font-size: 1.3rem;
+              margin-left: 0.3rem;
+              vertical-align: -5px;
+            }
+            a {
+              padding: 0.435rem 0.6rem;
+              display: inline-block;
+              color: black;
+              text-decoration: none;
+              &:hover {
+                background-color: $accent;
+                color: white;
+              }
+              &.active {
+                background-color: black;
+                color: white;
+              }
+            }
+            &:hover {
+              border-color: $accent;
+            }
+            &.remove-filters {
+              border-color: transparent !important;
+              height: 38px;
+              width: 0;
+              overflow: hidden;
+              transition: 0.2s;
+              a {
+                height: 38px;
+                width: 38px;
+                padding: 0;
+                i {
+                  font-size: 1.6rem;
+                  margin-left: 0.43rem;
+                }
+              }
+              &.active {
+                width: 38px;
+                margin-right: 0.5rem;
+              }
+            }
+          }
+        }
+      }
     }
     &#spellsheet {
       margin-top: 0;
@@ -237,12 +314,17 @@ main {
             font-size: 1.8rem;
             margin: 1.5rem 0 0.5rem;
             display: block;
+            position: sticky;
+            top: 0;
+            background-color: white;
+            z-index: 1;
           }
           .spells {
             padding: 0;
             display: grid;
             grid-gap: 1.5rem;
             grid-template-columns: 1fr 1fr 1fr;
+            position: relative;
             @media only screen and (max-width: 1200px) {
               grid-template-columns: 1fr 1fr;
             }
@@ -258,6 +340,9 @@ main {
                 .controls {
                   display: block;
                 }
+              }
+              &.filter-hidden {
+                display: none;
               }
               .controls {
                 position: absolute;
@@ -306,6 +391,9 @@ main {
               .spell_inner {
                 p {
                   font-size: 0.9rem;
+                  &:not(:last-child) {
+                    margin-bottom: 0.5rem;
+                  }
                 }
                 h3 {
                   position: relative;
@@ -406,6 +494,21 @@ main {
             }
             ul {
               padding: 0;
+            }
+            &[data-level="0"] {
+              // &:before {
+              //   position: absolute;
+              //   content: "";
+              //   left: -32px;
+              //   top: 0;
+              //   height: 150px;
+              //   width: 20px;
+              //   background-color: black;
+              //   content: "cantrips";
+              //   color: white;
+              //   writing-mode: vertical-lr;
+              //   text-orientation: mixed;
+              // }
             }
           }
         }
