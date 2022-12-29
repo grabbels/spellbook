@@ -16,6 +16,11 @@
   }
 }
 
+ul {
+  list-style: none;
+  padding: 0;
+}
+
 h3 {
   font-size: 1.2rem;
   font-weight: 700;
@@ -92,6 +97,8 @@ main {
               position: absolute;
               top: 100%;
               right: 0;
+              z-index: 3;
+              background-color: white;
               ul {
                 list-style: none;
                 padding: 1rem;
@@ -176,10 +183,10 @@ main {
             padding: 0;
             overflow: auto;
             max-height: 70vh;
-            border-radius: 0 0 10px 10px;
+            // border-radius: 0 0 10px 10px;
             border: lightgrey solid 1px;
             width: 100%;
-            z-index: 1;
+            z-index: 4;
             display: none;
             &.dark {
               filter: invert(1);
@@ -201,7 +208,8 @@ main {
                 position: relative;
                 &:after {
                   position: absolute;
-                  content: "+";
+                  font-family: 'remixicon' !important;
+                  content: "\ea13";
                   right: 10px;
                   font-size: 30px;
                   opacity: 0;
@@ -231,18 +239,21 @@ main {
       .inner_box {
         width: 100%;
         display: flex;
-        justify-content: right;
+        justify-content: center;
         flex-wrap: wrap;
-        h3 {
-          width: 100%;
-          text-align: right;
-        }
+
         ul.filters {
           list-style: 0;
           padding: 0;
           display: flex;
           gap: 0.5rem;
           margin-right: -0.5rem;
+          h3 {
+            width: 100%;
+            text-align: right;
+            margin-top: 6px;
+            padding-right: 6px;
+          }
           li.filter,
           li.remove-filters,
           input {
@@ -383,6 +394,16 @@ main {
                       width: 120px;
                     }
                   }
+                  &.color_picker {
+                    span {
+                      top: 2px;
+                    }
+                    i {
+                      font-size: 1.1rem;
+                      vertical-align: 3px;
+                      margin-right: 0.2rem;
+                    }
+                  }
                 }
               }
               &:only-child {
@@ -393,6 +414,9 @@ main {
                   font-size: 0.9rem;
                   &:not(:last-child) {
                     margin-bottom: 0.5rem;
+                  }
+                  &.description {
+                    display: none;
                   }
                 }
                 h3 {

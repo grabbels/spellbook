@@ -121,8 +121,18 @@ function addToSheet(e) {
   if (e.casting_time === "1 bonus action") {
     var castingTime = "1 bns";
   }
-  if (e.description.includes("failed save") || e.description.includes("saving throw")) {
-    var savingThrow = "yes";
+  if (e.description.includes("Strength saving throw")) {
+    var savingThrow = "Str";
+  } else if (e.description.includes("Dexterity saving throw")) {
+    var savingThrow = "Dex";
+  } else if (e.description.includes("Constitution saving throw")) {
+    var savingThrow = "Con";
+  } else if (e.description.includes("Intelligence saving throw")) {
+    var savingThrow = "Int";
+  } else if (e.description.includes("Wisdom saving throw")) {
+    var savingThrow = "Wis";
+  } else if (e.description.includes("Charisma saving throw")) {
+    var savingThrow = "Cha";
   } else {
     var savingThrow = "no";
   }
@@ -204,7 +214,7 @@ function addToSheet(e) {
   // console.log(description)
 
   spell.innerHTML =
-    '<div class="spell_inner"><div class="controls"><a href="#" class="moveup_spell"><span>Move spell up</span><i class="ri-arrow-up-s-line"></i></a><a href="#" class="movedown_spell"><span>Move spell down</span><i class="ri-arrow-down-s-line"></i></a><a href="#" class="remove_spell"><span>Remove spell</span><i class="ri-close-line"></i></a></div><h3><i class="' +
+    '<div class="spell_inner"><div class="controls"><a href="#" class="color_picker"><span>Change colors</span><i class="ri-paint-brush-line"></i></a><a href="#" class="moveup_spell"><span>Move spell up</span><i class="ri-arrow-up-s-line"></i></a><a href="#" class="movedown_spell"><span>Move spell down</span><i class="ri-arrow-down-s-line"></i></a><a href="#" class="remove_spell"><span>Remove spell</span><i class="ri-close-line"></i></a></div><h3><i class="' +
     icon +
     '" title="' +
     e.school +
@@ -228,7 +238,7 @@ function addToSheet(e) {
     materialsNeeded +
     '<li class="ritual"><p><i title="ritual" class="ri-open-arm-line"></i>' +
     ritual +
-    "</p></li></ul><p class='padding: 0.435rem 0.6rem;'>" +
+    "</p></li></ul><p class='description'>" +
     description +
     "</p>" +
     higherLevel +
@@ -240,20 +250,10 @@ function addToSheet(e) {
     var spellLevel = e.level;
   }
   // console.log(spellLists);
-  // spellLists[spellLevel].appendChild(spell);
-  // console.log(activeSpells);
-  // localStorage.setItem("activeSpells", JSON.stringify(activeSpells));
-  // console.log(spellLists[spellLevel]);
-  // console.log(spell);
   spellLists[spellLevel].appendChild(spell);
-  // spellLists[spellLevel].style.display = 'block';
-  // spellLists[spellLevel].previousElementSibling.style.display = 'block';
-  // console.log(spellLists[spellLevel]);
-  // var spellSheet = allSpellLists.innerHTML;
-  // console.log(activeSpells)
-  // localStorage.setItem("activeSpells", spellSheet);
   hideShowLevels();
   bindRemoveMoveSpell(spell);
+  checkUpDownSetOrder();
 }
 
 function bindRemoveMoveSpell(e) {
@@ -489,7 +489,7 @@ filters.forEach((e) => {
             }
             console.log(activeFilters);
             filterSpells();
-          } 
+          }
         });
       }
       activateFilter(event.target);
@@ -526,7 +526,6 @@ function filterSpells() {
     if (activeFilters.length < 1) {
       e.classList.remove("filter-hidden");
     } else {
-      
       var elementData = JSON.stringify(e.dataset);
       if (!activeFilters.every((i) => elementData.includes(i))) {
         e.classList.add("filter-hidden");
