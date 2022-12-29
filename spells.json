@@ -858,6 +858,62 @@
         "type": "1st-level necromancy"
     },
     {
+        "casting_time": "1 action",
+        "classes": [
+            "sorcerer",
+            "wizard"
+        ],
+        "components": {
+            "material": true,
+            "materials_needed": [
+                "alchemist’s supplies"
+            ],
+            "raw": "V, S, M, (alchemist’s supplies)",
+            "somatic": true,
+            "verbal": true
+        },
+        "description": "You create a healing elixir in a simple vial that appears in your hand. The elixir retains its potency for the duration or until it’s consumed, at which point the vial vanishes. As an action, a creature can drink the elixir or administer it to another creature. The drinker regains 2d4 + 2 hit points.",
+        "duration": "24 hours",
+        "level": "1",
+        "name": "Healing Elixir",
+        "range": "Self",
+        "ritual": false,
+        "school": "conjuration",
+        "tags": [
+            "wizard",
+            "warlock",
+            "level1"
+        ],
+        "type": "1st-level conjuration"
+    },
+    {
+        "casting_time": "1 minute",
+        "classes": [
+            "sorcerer",
+            "wizard"
+        ],
+        "components": {
+            "material": false,
+            "raw": "V",
+            "somatic": false,
+            "verbal": true
+        },
+        "description": "You create a lash of lightning energy that strikes at one creature of your choice that you can see within 15 feet of you. The target must succeed on a Strength saving throw or be pulled up to 10 feet in a straight line toward you and then take 1d8 lightning damage if it is within 5 feet of you.",
+        "duration": "Instantaneous",
+        "higher_levels": "This spell's damage increases by 1d8 when you reach 5th level (2d8), 11th level (3d8), and 17th level (4d8).",
+        "level": "cantrip",
+        "name": "Lightning Lure",
+        "range": "Self (15-foot radius)",
+        "ritual": false,
+        "school": "evocation",
+        "tags": [
+            "sorcerer",
+            "wizard",
+            "cantrip"
+        ],
+        "type": "Evocation cantrip"
+    },
+    {
         "casting_time": "1 reaction, which you take when you or a creature within 60 feet of you falls",
         "classes": [
             "bard",
@@ -887,6 +943,34 @@
             "level1"
         ],
         "type": "1st-level transmutation"
+    },
+    {
+        "casting_time": "1 reaction*",
+        "classes": [
+            "bard",
+            "sorcerer",
+            "wizard"
+        ],
+        "components": {
+            "material": false,
+            "raw": "V",
+            "somatic": false,
+            "verbal": true
+        },
+        "description": "You magically distract the triggering creature and turn its momentary uncertainty into encouragement for another creature. The triggering creature must reroll the d20 and use the lower roll.\n\nYou can then choose a different creature you can see within range (you can choose yourself). The chosen creature has advantage on the next attack roll, ability check, or saving throw it makes within 1 minute. A creature can be empowered by only one use of this spell at a time.\n\n*which you take when a creature you can see within 60 feet of yourself succeeds on an attack roll, an ability check, or a saving throw",
+        "duration": "Instantaneous",
+        "level": "1",
+        "name": "Silvery Barbs",
+        "range": "60 feet",
+        "ritual": false,
+        "school": "enchantment",
+        "tags": [
+            "bard",
+            "sorcerer",
+            "wizard",
+            "level1"
+        ],
+        "type": "1st-level enchantment"
     },
     {
         "casting_time": "1 hour",

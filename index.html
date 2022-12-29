@@ -12,47 +12,32 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="compiled/css/style.min.css" />
-    <script src="https://unpkg.com/akar-icons-fonts"></script>
+    <!-- <script src="https://unpkg.com/akar-icons-fonts"></script> -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
   </head>
 
   <body>
-    <!-- <script>
-      const $input = document.querySelector("#file");
-      $input.addEventListener("change", (event) => {
-        const data = new FormData();
-        data.append("file", event.target.files[0]);
-        fetch("/upload", {
-          method: "post",
-          body: data,
-        })
-          .then((res) => res.text())
-          .then((res) => {
-            const log = document.createElement("p");
-            log.innerHTML = res;
-            document.body.appendChild(log);
-          });
-      });
-    </script> -->
-
     <main>
       <div class="outer_box" id="header">
         <div class="inner_box">
           <div class="header_left">
-            <button>Save spellbook</button>
-            <button id="clear">Clear all</button>
-            <!-- <form action="/upload" enctype="multipart/form-data" method="post">
-            <input type="file" name="filename"><br>
-            <button>Upload</button>
-          </form> -->
-            <input type="file" id="file" />
+            <button><i class="ri-save-3-line"></i> Export spellbook</button>
+            <button id="clear"><i class="ri-delete-bin-line"></i> Clear all</button>
+            <label for="input-file">
+              <i class="ri-folder-open-line"></i> Import spellbook
+              <input type="file" id="input-file" style="display: none" accept=".ink" />
+            </label>
           </div>
           <div class="header_right">
             <div class="visual_prefs">
-              <a class="menu_button" id="visual_prefs_button" title="Visual preferences" href="#"><i class="ai-sun"></i></a>
+              <a class="menu_button" id="visual_prefs_button" title="Visual preferences" href="#"><i class="ri-sun-line"></i></a>
               <div id="visual_prefs_panel">
                 <ul>
-                  <li><a href="#" title="Enable dark mode" id="dark_mode"><i class="ai-moon"></i>Dark mode</a></li>
-                  <li></li>
+                  <li>
+                    <a href="#" title="Enable dark mode" id="dark_mode"><i class="ri-moon-line"></i>Dark mode</a>
+                  </li>
+                  <!-- <li class="brightness"><i class="ai-sun"></i><input id="brightness" type="range" value="100" min="10" max="100"></li>
+                  <li class="contrast"><i class="ai-circle"></i><i class="ai-circle-fill"></i><input id="contrast" type="range" value="100" min="10" max="100"></li> -->
                   <li></li>
                 </ul>
               </div>
@@ -62,7 +47,7 @@
       </div>
       <div class="outer_box" id="title">
         <div class="inner_box">
-          <h1><i class="ai-book-open"></i> Inky's Tentacletastic Spellbook</h1>
+          <h1><i class="ri-book-mark-line"></i> Inky's Tentacletastic Spellbook</h1>
         </div>
       </div>
       <div class="outer_box" id="search">
@@ -70,7 +55,7 @@
           <div class="search_wrapper">
             <input type="text" id="spellsearch" placeholder="Add spells..." />
             <ul id="results"></ul>
-            <div id="loading"></div>
+            <div id="loading" class="" style="opacity: 1"><i class="ri-more-line"></i></div>
           </div>
         </div>
       </div>
@@ -81,9 +66,9 @@
       </div>
       <div class="outer_box" id="spellsheet">
         <div class="inner_box">
-          <div class="spellsheet_wrapper">
+          <div class="spellsheet_wrapper" id="spellsheet_wrapper">
             <h2 data-level="0">Cantrips</h2>
-            <ul class="spells" id="spells" data-level="0"></ul>
+            <ul class="spells" data-level="0"></ul>
             <h2 data-level="1">Level 1</h2>
             <ul class="spells" data-level="1"></ul>
             <h2 data-level="2">Level 2</h2>

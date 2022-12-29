@@ -41,6 +41,29 @@ main {
         justify-content: space-between;
         width: 100%;
         max-width: 1600px;
+        .header_left {
+          display: flex;
+          height: auto;
+          gap: .5rem;
+          button,
+          label {
+            background-color: transparent;
+            border: 1px solid black;
+            border-radius: 0;
+            display: inline-block;
+            padding: .4rem .6rem;
+            height: 38px;
+            cursor: pointer;
+            i {
+              vertical-align: bottom;
+            }
+            &:hover {
+              background-color: $accent;
+              border-color: $accent;
+              color: white;
+            }
+          }
+        }
         .header_right {
           a {
             font-size: 1rem;
@@ -85,6 +108,14 @@ main {
         }
       }
     }
+    &#title {
+      h1 {
+        i {
+          font-size: 2.3rem;
+          vertical-align: sub;
+        }
+      }
+    }
     &#search {
       .inner_box {
         max-width: 350px;
@@ -96,27 +127,34 @@ main {
         .search_wrapper {
           position: relative;
           width: 100%;
-          // max-width: 350px;
           #loading {
             width: 30px;
             height: 30px;
-            background-color: red;
             position: absolute;
             top: 10px;
             right: 10px;
-            transition: 0.2s;
             opacity: 0;
+            overflow: hidden;
+            i {
+              font-size: 1.8rem;
+              position: absolute;
+              top: -5px;
+              left: -100%;
+            }
             &.active {
-              animation: loading;
-              animation-iteration-count: infinite;
-              animation-duration: 1s;
+              i {
+                animation: loading;
+                animation-iteration-count: infinite;
+                animation-duration: 0.8s;
+                animation-timing-function: linear;
+              }
               opacity: 1;
               @keyframes loading {
                 0% {
-                  transform: rotate(0deg);
+                  left: -100%;
                 }
                 100% {
-                  transform: rotate(360deg);
+                  left: 100%;
                 }
               }
             }
@@ -198,6 +236,7 @@ main {
           h2 {
             font-size: 1.8rem;
             margin: 1.5rem 0 0.5rem;
+            display: block;
           }
           .spells {
             padding: 0;
@@ -241,7 +280,7 @@ main {
                     position: absolute;
                     // transition: 0.2s;
                     width: 0;
-                    font-size: .9rem;
+                    font-size: 0.9rem;
                     right: calc(100% + 0.15rem);
                     top: 7px;
                     overflow: hidden;
@@ -274,6 +313,7 @@ main {
                   margin-bottom: 0.5rem;
                   i {
                     margin-right: 0.35rem;
+                    vertical-align: bottom;
                   }
                   span {
                     font-size: 1.1rem;
@@ -311,6 +351,13 @@ main {
                   }
                   &.small {
                     margin-bottom: 1rem;
+                    li {
+                      p {
+                        i {
+                          vertical-align: -5px;
+                        }
+                      }
+                    }
                   }
                   li {
                     display: inline-block;
@@ -322,7 +369,7 @@ main {
                     i {
                       font-size: 1.2rem;
                       margin-right: 0.3rem;
-                      vertical-align: -1px;
+                      vertical-align: -4px;
                     }
                     p {
                       font-size: 0.9rem;
@@ -346,6 +393,8 @@ main {
                         // font-size: 1.3rem;
                         margin-right: 0.2rem;
                         display: inline-block;
+                        font-size: 1rem;
+                        vertical-align: -3.5px;
                       }
                     }
                   }
