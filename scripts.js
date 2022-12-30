@@ -22,6 +22,7 @@ var darkButton = document.getElementById("dark_mode");
 var brightnessSlider = document.getElementById("brightness");
 var contrastSlider = document.getElementById("contrast");
 var headerLeft = document.querySelector("#header .header_left");
+var tempSpellContainer = document.getElementById("temp_spell");
 const activeSpellsJson = [];
 
 //////////CHECK FOR VISUAL SETTINGS IN LOCALSTORAGE AND SET THEM///////
@@ -64,13 +65,13 @@ darkButton.addEventListener("click", () => {
 
 ///////////////////////CHECK FOR LOCAL STORAGE SPELLSHEET//////////////////
 if (localStorage.activeSpells) {
-  const activeSpellsHtml = localStorage.activeSpells;
-  allSpellLists.innerHTML = activeSpellsHtml;
-  var allSpellLists = document.getElementById("spellsheet_wrapper");
-  var spellLists = document.querySelectorAll("ul.spells");
-  var addedSpells = document.querySelectorAll("li.spell");
-  addedSpells.forEach((e) => {
-    bindRemoveMoveSpell(e);
+  const activeSpellsJson = JSON.parse(localStorage.activeSpells);
+  // allSpellLists.innerHTML = activeSpellsHtml;
+  // var allSpellLists = document.getElementById("spellsheet_wrapper");
+  // var spellLists = document.querySelectorAll("ul.spells");
+  // var addedSpells = document.querySelectorAll("li.spell");
+  activeSpellsJson.forEach((e) => {
+    addToSheet(e);
   });
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -112,7 +113,7 @@ function bindCloseResultsContainer(e) {
   });
 }
 
-function addToSheet(e) {
+function addToSheet(e, type, id) {
   // console.log(e)
   // if (activeSpells.some((item) => item.name === e.name)) {
   //   window.alert("This spell is already in your spellbook!");
@@ -251,46 +252,70 @@ function addToSheet(e) {
     var spellLevel = e.level;
   }
   // console.log(spellLists);
-  activeSpellsJson.push(e);
-  console.log(activeSpellsJson);
-  spellLists[spellLevel].appendChild(spell);
-  hideShowLevels();
-  bindRemoveMoveSpell(spell);
-  checkUpDownSetOrder();
+  if (type === "temp") {
+    var spellLink = '<a href="#" class="spell_link" id="' + id + '">' + query + "</a>";
+    console.log(spellLink);
+    tempSpellContainer.appendChild(spell);
+    // tempSpellContainer.parentElement.style.display = 'block';
+    document.body.style.overflowY = "hidden";
+    spell.querySelector(".remove_spell").addEventListener("click", (e) => {
+      spell.remove();
+      // tempSpellContainer.parentElement.style.display = "none";
+      document.body.style.overflowY = "auto";
+    });
+  } else {
+    activeSpellsJson.push(e);
+    // console.log(activeSpellsJson);
+    spellLists[spellLevel].appendChild(spell);
+    hideShowLevels();
+    bindRemoveMoveSpell(spell);
+    checkUpDownSetOrder();
+  }
 }
 
 function bindRemoveMoveSpell(e) {
   e.querySelector(".remove_spell").addEventListener("click", () => {
     event.preventDefault();
+    var allSpellsHtml = document.querySelectorAll("li.spell");
+    var toBeRemovedIndex = "";
+    Array.from(allSpellsHtml).some((el, index) => {
+      toBeRemovedIndex = index;
+      return el === e;
+    });
+    activeSpellsJson.splice(toBeRemovedIndex, 1);
+    console.log(activeSpellsJson);
     e.remove();
     checkUpDownSetOrder();
     hideShowLevels();
   });
   e.querySelector(".movedown_spell").addEventListener("click", () => {
     event.preventDefault();
-    console.log(activeSpellsJson);
     var allSpellsHtml = document.querySelectorAll("li.spell");
-    // allSpellsHtml.forEach((el, index) => {
-    //   if (el === e) {
-    //     var oldIndex = index;
-    //   }
-    // });
     var oldIndex = "";
     Array.from(allSpellsHtml).some((el, index) => {
-      console.log(el);
       oldIndex = index;
       return el === e;
     });
-    console.log(oldIndex);
     var newIndex = oldIndex + 1;
-    console.log(newIndex);
     var movedElement = activeSpellsJson.splice(oldIndex, 1);
-    console.log(movedElement);
+    e.parentNode.insertBefore(e.nextElementSibling, e);
+    activeSpellsJson.splice(newIndex, 0, movedElement[0]);
+    console.log(activeSpellsJson);
     checkUpDownSetOrder();
   });
   e.querySelector(".moveup_spell").addEventListener("click", () => {
     event.preventDefault();
+    var allSpellsHtml = document.querySelectorAll("li.spell");
+    var oldIndex = "";
+    Array.from(allSpellsHtml).some((el, index) => {
+      oldIndex = index;
+      return el === e;
+    });
+    var newIndex = oldIndex - 1;
+    var movedElement = activeSpellsJson.splice(oldIndex, 1);
     e.parentNode.insertBefore(e, e.previousElementSibling);
+    activeSpellsJson.splice(newIndex, 0, movedElement[0]);
+    console.log(activeSpellsJson);
     checkUpDownSetOrder();
   });
 }
@@ -332,11 +357,6 @@ function hideShowLevels() {
   saveSpellSheet();
 }
 
-function saveSpellSheet() {
-  var spellSheet = allSpellLists.innerHTML;
-  localStorage.setItem("activeSpells", spellSheet);
-}
-
 // function saveOrder() {
 //   const activeSpellsOrder = [];
 //   document.querySelectorAll(".spell").forEach((e) => {
@@ -374,7 +394,7 @@ searchBox.addEventListener(
 //   }
 // });
 
-function fetchSpells(query) {
+function fetchSpells(query, type) {
   fetch("../spells.json")
     .then((res) => res.json())
     .then((data) => {
@@ -387,50 +407,29 @@ function fetchSpells(query) {
           resultsIndex.push(index);
         }
       });
-      if (results.length > 0) {
-        results.forEach((e, index) => {
-          createResult(e, resultsIndex);
-        });
-        loadingAnimation.classList.remove("active");
-        resultsContainer.classList.add("open");
-        bindCloseResultsContainer();
+      console.log(results);
+      if (type === "temp") {
+        addToSheet(results[0], type);
       } else {
-        resultsContainer.innerHTML = "<li><p>No results</p></li>";
-        loadingAnimation.classList.remove("active");
-        resultsContainer.classList.add("open");
-        bindCloseResultsContainer();
+        if (results.length > 0) {
+          results.forEach((e, index) => {
+            createResult(e, resultsIndex);
+          });
+          loadingAnimation.classList.remove("active");
+          resultsContainer.classList.add("open");
+          bindCloseResultsContainer();
+        } else {
+          resultsContainer.innerHTML = "<li><p>No results</p></li>";
+          loadingAnimation.classList.remove("active");
+          resultsContainer.classList.add("open");
+          bindCloseResultsContainer();
+        }
       }
     })
     .catch(function (err) {
       // There was an error
       console.warn("Something went wrong.", err);
     });
-  // var fetchUrl = "https://api.open5e.com/spells/?search=" + i;
-  // fetch(fetchUrl)
-  //   .then(function (response) {
-  //     // The API call was successful!
-  //     return response.json();
-  //   })
-  //   .then(function (data) {
-  //     // This is the JSON from our response
-  //     if (data["results"].length > 0) {
-  //       data["results"].forEach((e, index) => {
-  //         createResult(e);
-  //       });
-  //       loadingAnimation.classList.remove("active");
-  //       resultsContainer.classList.add("open");
-  //       bindCloseResultsContainer();
-  //     } else {
-  //       resultsContainer.innerHTML = "<li><p>No results</p></li>";
-  //       loadingAnimation.classList.remove("active");
-  //       resultsContainer.classList.add("open");
-  //       bindCloseResultsContainer();
-  //     }
-  //   })
-  //   .catch(function (err) {
-  //     // There was an error
-  //     console.warn("Something went wrong.", err);
-  //   });
 }
 
 document.querySelector("button").addEventListener("click", () => {
@@ -439,42 +438,41 @@ document.querySelector("button").addEventListener("click", () => {
 
 function downloadFile() {
   saveSpellSheet();
-  const activeSpellsHtml = localStorage.activeSpells;
+  const activeSpellsSave = localStorage.activeSpells;
   let a = document.createElement("a");
   var name = prompt("Filename:");
-  if (typeof a.download !== "undefined") a.download = name + ".ink";
+  if (typeof a.download !== "undefined") a.download = name + ".json";
   a.href = URL.createObjectURL(
-    new Blob([activeSpellsHtml], {
+    new Blob([activeSpellsSave], {
       type: "application/octet-stream",
     })
   );
   a.dispatchEvent(new MouseEvent("click"));
 }
 
-////////////////////SAVE FILE UPLOAD/////////////////
+////////////////////SAVE FILE UPLOAD/IMPORT/////////////////
 
 document.getElementById("input-file").addEventListener("change", getFile);
 
 function getFile(event) {
   const input = event.target;
   if ("files" in input && input.files.length > 0) {
-    allSpellLists.innerHTML = "";
-    placeFileContent(allSpellLists, input.files[0]);
+    // allSpellLists.innerHTML = "";
+    placeFileContent(activeSpellsJson, input.files[0]);
   }
 }
 
 function placeFileContent(target, file) {
   readFileContent(file)
     .then((content) => {
-      target.innerHTML = content;
-      var addedSpells = document.querySelectorAll("li.spell");
-      addedSpells.forEach((e) => {
-        bindRemoveMoveSpell(e);
-        checkUpDownSetOrder();
+      const activeSpellsJson = JSON.parse(content);
+
+      activeSpellsJson.forEach((e) => {
+        console.log(e);
+        addToSheet(e);
       });
-      saveSpellSheet();
     })
-    .catch((error) => console.log(error));
+    .catch((error) => alert(error));
 }
 
 function readFileContent(file) {
@@ -566,6 +564,66 @@ function enableFeatures() {
 }
 
 ///////////////////////////////////////////////////////////////
+
+/////////////////////DESCRIPTION SPELL LINKS///////////////////
+var string = 'life only by means of a *[true resurrection](../true-resurrection/ "true resurrection (lvl 9)")* or a';
+var query = string.substring(string.indexOf("[") + 1, string.indexOf("]"));
+var shortcode = string.substring(string.indexOf("*"), string.indexOf("*", string.indexOf("*") + 1) + 1);
+var id = Math.floor(Math.random() * 1000000) + 1;
+// var spellLink = '<a href="#" class="spell_link">'+query+'</a>';
+console.log(shortcode);
+var type = "temp";
+fetchSpells(query, type, id);
+// console.log(string.substring(string.indexOf("*"), string.indexOf("*", string.indexOf("*") + 1)));
+// console.log(string.substring(string.indexOf("*"), string.indexOf("*", string.indexOf("*") + 1)));
+
+
+
+
+
+
+
+
+fetch("../spells.json")
+  .then((res) => res.json())
+  .then((data) => {
+    // let results = data.filter((x, index) => x.name.toLowerCase().includes(query.toLowerCase()));
+    let results = [];
+    let resultsIndex = [];
+    // console.log(data)
+    console.log(JSON.stringify(data).replace('*', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa'))
+    // data.forEach((e) => {
+      
+    //   if (e.description.includes('*[')) {
+    //     console.log(e.description);
+    //     e.description[prop].replace('*',);
+    //   }
+    // });
+    // console.log(results);
+  })
+  .catch(function (err) {
+    // There was an error
+    console.warn("Something went wrong.", err);
+  });
+
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////
+
+///////////////////SAVE TO LOCALSTORAGE FUNCTION///////////////
+function saveSpellSheet() {
+  if (activeSpellsJson.length) {
+    localStorage.setItem("activeSpells", JSON.stringify(activeSpellsJson));
+  }
+}
+/////////////////////////////////////////////////////////////////
 
 // const spellNames = [
 //   "Acid Splash",
