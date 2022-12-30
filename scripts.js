@@ -23,7 +23,9 @@ var brightnessSlider = document.getElementById("brightness");
 var contrastSlider = document.getElementById("contrast");
 var headerLeft = document.querySelector("#header .header_left");
 var tempSpellContainer = document.getElementById("temp_spell");
-const activeSpellsJson = [];
+var nameFilter = document.getElementById("name_filter");
+const activeSpellsArray = [];
+var fromstorage = false;
 
 //////////CHECK FOR VISUAL SETTINGS IN LOCALSTORAGE AND SET THEM///////
 if (localStorage.darkMode === "true") {
@@ -63,17 +65,74 @@ darkButton.addEventListener("click", () => {
 
 ///////////////////////////////////////////////////////////////////////////
 
+// const test = async (_) => {
+//   const one = await getOne();
+//   console.log(one); // 1
+// };
+
+// test();
 ///////////////////////CHECK FOR LOCAL STORAGE SPELLSHEET//////////////////
+const delay = async (ms = 10) => new Promise((resolve) => setTimeout(resolve, ms));
 if (localStorage.activeSpells) {
-  const activeSpellsJson = JSON.parse(localStorage.activeSpells);
-  // allSpellLists.innerHTML = activeSpellsHtml;
-  // var allSpellLists = document.getElementById("spellsheet_wrapper");
-  // var spellLists = document.querySelectorAll("ul.spells");
-  // var addedSpells = document.querySelectorAll("li.spell");
-  activeSpellsJson.forEach((e) => {
-    addToSheet(e);
-  });
+  populateSpellsFromStorage();
+  
 }
+// const activeSpellsArray = localStorage.activeSpells.split(",");
+// console.log(activeSpellsArray);
+// var length = activeSpellsArray.length;
+// var type = "direct";
+// for (var i = 0, len = activeSpellsArray.length; i < len; i++) {
+//   var query = activeSpellsArray[i];
+//   fetchSpells(query, type, length);
+// }
+// activeSpellsArray.length = 0;
+
+async function populateSpellsFromStorage(array) {
+  var type = "direct";
+  if (!array) {
+    var activeSpellsArray = localStorage.activeSpells.split(",");
+  } else {
+    var activeSpellsArray = array.split(",");
+  }
+  for (var i = 0, len = activeSpellsArray.length; i < len; i++) {
+    var query = activeSpellsArray[i];
+    fetchSpells(query, type, length);
+    await delay(10);
+  }
+}
+// const delay = async (ms = 10) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// async function dopopulateSpellsFromStorage() {
+//   var type = "direct";
+//   const activeSpellsArray = localStorage.activeSpells.split(",");
+//   for (var i = 0, len = activeSpellsArray.length; i < len; i++) {
+//     var query = activeSpellsArray[i];
+//     await fetchSpellsDirect(query);
+//     console.log('done')
+//   }
+// }
+// dopopulateSpellsFromStorage();
+
+// function functionA() {
+//   return new Promise((resolve) => resolve(1));
+// }
+
+// function functionB() {
+//   return new Promise((resolve) => resolve(2));
+// }
+
+// function functionC(first, second) {
+//   return first + second;
+// }
+
+// functionA()
+//   .then((result) => Promise.all([result, functionB()]))
+//   .then(function ([first, second]) {
+//     return functionC(first, second);
+//   })
+//   .then((result) => {
+//     console.log(result);
+//   });
 ////////////////////////////////////////////////////////////////////////////
 
 document.querySelector("#clear").addEventListener("click", () => {
@@ -113,13 +172,45 @@ function bindCloseResultsContainer(e) {
   });
 }
 
-function addToSheet(e, type, id) {
-  // console.log(e)
-  // if (activeSpells.some((item) => item.name === e.name)) {
-  //   window.alert("This spell is already in your spellbook!");
-  // } else {
-  // activeSpells.push(e);
+function fetchSpells(query, type, length) {
+  fetch("../spells.json")
+    .then((res) => res.json())
+    .then((data) => {
+      let results = [];
+      let resultsIndex = [];
+      for (var i = 0, len = data.length; i < len; i++) {
+        if (data[i].name.toLowerCase().includes(query.toLowerCase())) {
+          results.push(data[i]);
+        }
+      }
+      if (type === "temp") {
+        addToSheet(results[0], type);
+      } else if (type === "direct") {
+        addToSheet(results[0], type, length);
+      } else {
+        if (results.length > 0) {
+          results.forEach((e, index) => {
+            createResult(e, resultsIndex);
+          });
+          loadingAnimation.classList.remove("active");
+          resultsContainer.classList.add("open");
+          bindCloseResultsContainer();
+        } else {
+          resultsContainer.innerHTML = "<li><p>No results</p></li>";
+          loadingAnimation.classList.remove("active");
+          resultsContainer.classList.add("open");
+          bindCloseResultsContainer();
+        }
+      }
+    });
+}
+
+async function addToSheet(e, type, length) {
   const spell = document.createElement("li");
+  if (activeSpellsArray.includes(e.name)) {
+    alert("This spell is already in your spellbook!");
+    return;
+  }
   if (e.casting_time === "1 bonus action") {
     var castingTime = "1 bns";
   }
@@ -213,6 +304,14 @@ function addToSheet(e, type, id) {
   }
 
   var description = e.description.replace("/n/n", "</p><p>");
+  var descriptionSpellLinks = description.match(/\[(.*?)\]/g);
+  if (descriptionSpellLinks) {
+    descriptionSpellLinks.forEach((e) => {
+      var spellTitle = e.replace("[", "").replace("]", "");
+      var spellLink = '<a href="#" class="spell_link">' + spellTitle + "</a>";
+      description = description.replace(e, spellLink);
+    });
+  }
   // console.log(description)
 
   spell.innerHTML =
@@ -240,9 +339,9 @@ function addToSheet(e, type, id) {
     materialsNeeded +
     '<li class="ritual"><p><i title="ritual" class="ri-open-arm-line"></i>' +
     ritual +
-    "</p></li></ul><p class='description'>" +
+    "</p></li></ul><div class='description_wrapper'><p>" +
     description +
-    "</p>" +
+    "</p></div>" +
     higherLevel +
     "</div>";
   // console.log(e)
@@ -253,71 +352,148 @@ function addToSheet(e, type, id) {
   }
   // console.log(spellLists);
   if (type === "temp") {
-    var spellLink = '<a href="#" class="spell_link" id="' + id + '">' + query + "</a>";
-    console.log(spellLink);
     tempSpellContainer.appendChild(spell);
-    // tempSpellContainer.parentElement.style.display = 'block';
-    document.body.style.overflowY = "hidden";
+    tempSpellContainer.parentElement.style.display = "block";
+    document.body.style.position = "fixed";
+    document.body.style.overflowY = "scroll";
     spell.querySelector(".remove_spell").addEventListener("click", (e) => {
+      event.preventDefault();
       spell.remove();
-      // tempSpellContainer.parentElement.style.display = "none";
+      tempSpellContainer.parentElement.style.display = "none";
+      document.body.style.position = "static";
       document.body.style.overflowY = "auto";
     });
   } else {
-    activeSpellsJson.push(e);
-    // console.log(activeSpellsJson);
+    if (!activeSpellsArray.includes(e.name)) {
+      activeSpellsArray.push(e.name);
+    }
     spellLists[spellLevel].appendChild(spell);
     hideShowLevels();
     bindRemoveMoveSpell(spell);
     checkUpDownSetOrder();
+    if (descriptionSpellLinks) {
+      spell.querySelectorAll("a.spell_link").forEach((e) => {
+        e.addEventListener("click", () => {
+          event.preventDefault();
+          var query = e.innerHTML;
+          var type = "temp";
+          fetchSpells(query, type);
+        });
+      });
+    }
+    // console.log(activeSpellsArray);
+    saveSpellSheet();
   }
 }
 
 function bindRemoveMoveSpell(e) {
+  ///////////////REMOVE SPELL FUNCTION///////////////////
   e.querySelector(".remove_spell").addEventListener("click", () => {
     event.preventDefault();
-    var allSpellsHtml = document.querySelectorAll("li.spell");
-    var toBeRemovedIndex = "";
-    Array.from(allSpellsHtml).some((el, index) => {
-      toBeRemovedIndex = index;
-      return el === e;
-    });
-    activeSpellsJson.splice(toBeRemovedIndex, 1);
-    console.log(activeSpellsJson);
+    for (var i = 0, len = activeSpellsArray.length; i < len; i++) {
+      if (activeSpellsArray[i] === e.getAttribute("data-name")) {
+        activeSpellsArray.splice(i, 1);
+        break;
+      }
+    }
+    console.log(activeSpellsArray);
     e.remove();
+    saveSpellSheet();
     checkUpDownSetOrder();
     hideShowLevels();
   });
   e.querySelector(".movedown_spell").addEventListener("click", () => {
     event.preventDefault();
-    var allSpellsHtml = document.querySelectorAll("li.spell");
-    var oldIndex = "";
-    Array.from(allSpellsHtml).some((el, index) => {
-      oldIndex = index;
-      return el === e;
-    });
-    var newIndex = oldIndex + 1;
-    var movedElement = activeSpellsJson.splice(oldIndex, 1);
+    for (var i = 0, len = activeSpellsArray.length; i < len; i++) {
+      if (activeSpellsArray[i] === e.getAttribute("data-name")) {
+        var movedSpell = activeSpellsArray.splice(i, 1);
+        activeSpellsArray.splice(i + 1, 0, movedSpell.toString());
+        break;
+      }
+    }
+    console.log(activeSpellsArray);
     e.parentNode.insertBefore(e.nextElementSibling, e);
-    activeSpellsJson.splice(newIndex, 0, movedElement[0]);
-    console.log(activeSpellsJson);
+    saveSpellSheet();
     checkUpDownSetOrder();
   });
   e.querySelector(".moveup_spell").addEventListener("click", () => {
     event.preventDefault();
-    var allSpellsHtml = document.querySelectorAll("li.spell");
-    var oldIndex = "";
-    Array.from(allSpellsHtml).some((el, index) => {
-      oldIndex = index;
-      return el === e;
-    });
-    var newIndex = oldIndex - 1;
-    var movedElement = activeSpellsJson.splice(oldIndex, 1);
+    for (var i = 0, len = activeSpellsArray.length; i < len; i++) {
+      if (activeSpellsArray[i] === e.getAttribute("data-name")) {
+        var movedSpell = activeSpellsArray.splice(i, 1);
+        console.log(movedSpell);
+        activeSpellsArray.splice(i - 1, 0, movedSpell.toString());
+        break;
+      }
+    }
+    console.log(activeSpellsArray);
     e.parentNode.insertBefore(e, e.previousElementSibling);
-    activeSpellsJson.splice(newIndex, 0, movedElement[0]);
-    console.log(activeSpellsJson);
+    saveSpellSheet();
     checkUpDownSetOrder();
   });
+
+  // ///////////////REMOVE SPELL FUNCTION///////////////////
+  // e.querySelector(".remove_spell").addEventListener("click", () => {
+  //   event.preventDefault();
+  //   var allSpellsHtml = document.querySelectorAll("li.spell");
+  //   var removedName = e.getAttribute('data-name')
+  //   console.log(activeSpellsJson)
+  //   activeSpellsJson.forEach((e, i)=>{
+  //     // console.log(i)
+  //     if (removedName === e.name) {
+  //       // activeSpellsJson[(i + 1)].remove();
+  //       console.log(i)
+  //       activeSpellsJson.splice(i,1)
+  //     }
+  //   })
+  //   console.log(activeSpellsJson);
+  //   // var toBeRemovedIndex = "";
+  //   // Array.from(allSpellsHtml).some((el, index) => {
+  //   //   toBeRemovedIndex = index;
+  //   //   return el === e;
+  //   // });
+  //   // console.log(activeSpellsJson);
+  //   // console.log(toBeRemovedIndex);
+  //   // console.log(activeSpellsJson[toBeRemovedIndex]);
+  //   // activeSpellsJson.splice((toBeRemovedIndex - 1), 1);
+  //   e.remove();
+
+  //   checkUpDownSetOrder();
+  //   hideShowLevels();
+  //   saveSpellSheet();
+  // });
+  // e.querySelector(".movedown_spell").addEventListener("click", () => {
+  //   event.preventDefault();
+  //   var allSpellsHtml = document.querySelectorAll("li.spell");
+  //   var oldIndex = "";
+  //   Array.from(allSpellsHtml).some((el, index) => {
+  //     oldIndex = index;
+  //     return el === e;
+  //   });
+  //   var newIndex = oldIndex + 1;
+  //   var movedElement = activeSpellsJson.splice(oldIndex, 1);
+  //   e.parentNode.insertBefore(e.nextElementSibling, e);
+  //   activeSpellsJson.splice(newIndex, 0, movedElement[0]);
+  //   // console.log(activeSpellsJson);
+  //   saveSpellSheet();
+  //   checkUpDownSetOrder();
+  // });
+  // e.querySelector(".moveup_spell").addEventListener("click", () => {
+  //   event.preventDefault();
+  //   var allSpellsHtml = document.querySelectorAll("li.spell");
+  //   var oldIndex = "";
+  //   Array.from(allSpellsHtml).some((el, index) => {
+  //     oldIndex = index;
+  //     return el === e;
+  //   });
+  //   var newIndex = oldIndex - 1;
+  //   var movedElement = activeSpellsJson.splice(oldIndex, 1);
+  //   e.parentNode.insertBefore(e, e.previousElementSibling);
+  //   activeSpellsJson.splice(newIndex, 0, movedElement[0]);
+  //   // console.log(activeSpellsJson);
+  //   saveSpellSheet();
+  //   checkUpDownSetOrder();
+  // });
 }
 function checkUpDownSetOrder() {
   document.querySelectorAll(".spell").forEach((e) => {
@@ -334,7 +510,6 @@ function checkUpDownSetOrder() {
     // var index = Array.prototype.indexOf.call(e.parentNode.children, e);
     // var level = e.getAttribute("data-level").replace("cantrip", "0");
   });
-  saveSpellSheet();
 }
 hideShowLevels();
 function hideShowLevels() {
@@ -354,20 +529,7 @@ function hideShowLevels() {
       }
     }
   });
-  saveSpellSheet();
 }
-
-// function saveOrder() {
-//   const activeSpellsOrder = [];
-//   document.querySelectorAll(".spell").forEach((e) => {
-//     var name = e.getAttribute("data-name");
-//     var index = e.getAttribute("data-order");
-//     // console.log(name +' - '+ index
-//     activeSpellsOrder.push({ index, name });
-//   });
-//   console.log(activeSpellsOrder);
-//   localStorage.setItem("activeSpellsOrder", JSON.stringify(activeSpellsOrder));
-// }
 
 searchBox.addEventListener("input", (e) => {
   if (searchBox.value.length > 0) {
@@ -388,49 +550,6 @@ searchBox.addEventListener(
     }
   }, 600)
 );
-// searchBox.addEventListener("click", () => {
-//   if (resultsContainer.firstChild) {
-//     resultsContainer.classList.add("open");
-//   }
-// });
-
-function fetchSpells(query, type) {
-  fetch("../spells.json")
-    .then((res) => res.json())
-    .then((data) => {
-      // let results = data.filter((x, index) => x.name.toLowerCase().includes(query.toLowerCase()));
-      let results = [];
-      let resultsIndex = [];
-      data.forEach((e, index) => {
-        if (e.name.toLowerCase().includes(query.toLowerCase())) {
-          results.push(e);
-          resultsIndex.push(index);
-        }
-      });
-      console.log(results);
-      if (type === "temp") {
-        addToSheet(results[0], type);
-      } else {
-        if (results.length > 0) {
-          results.forEach((e, index) => {
-            createResult(e, resultsIndex);
-          });
-          loadingAnimation.classList.remove("active");
-          resultsContainer.classList.add("open");
-          bindCloseResultsContainer();
-        } else {
-          resultsContainer.innerHTML = "<li><p>No results</p></li>";
-          loadingAnimation.classList.remove("active");
-          resultsContainer.classList.add("open");
-          bindCloseResultsContainer();
-        }
-      }
-    })
-    .catch(function (err) {
-      // There was an error
-      console.warn("Something went wrong.", err);
-    });
-}
 
 document.querySelector("button").addEventListener("click", () => {
   downloadFile();
@@ -457,20 +576,22 @@ document.getElementById("input-file").addEventListener("change", getFile);
 function getFile(event) {
   const input = event.target;
   if ("files" in input && input.files.length > 0) {
-    // allSpellLists.innerHTML = "";
-    placeFileContent(activeSpellsJson, input.files[0]);
+    spellLists.forEach((e) => {
+      console.log("emptying");
+      e.innerHTML = "";
+    });
+    const activeSpellsArray = [];
+    placeFileContent(activeSpellsArray, input.files[0]);
   }
 }
 
 function placeFileContent(target, file) {
+  console.log("placing content");
   readFileContent(file)
     .then((content) => {
-      const activeSpellsJson = JSON.parse(content);
-
-      activeSpellsJson.forEach((e) => {
-        console.log(e);
-        addToSheet(e);
-      });
+      const activeSpellsArray = content.toString();
+      console.log(activeSpellsArray)
+      populateSpellsFromStorage(activeSpellsArray);
     })
     .catch((error) => alert(error));
 }
@@ -516,6 +637,20 @@ filters.forEach((e) => {
     }
   });
 });
+nameFilter.addEventListener(
+  "input",
+  debounce(() => {
+    console.log(nameFilter.value);
+    var allSpellsHtml = document.querySelectorAll("li.spell");
+    allSpellsHtml.forEach((e) => {
+      if (!e.getAttribute("data-name").toLowerCase().includes(nameFilter.value.toLowerCase())) {
+        e.classList.add("filter-hidden-by-name");
+      } else {
+        e.classList.remove("filter-hidden-by-name");
+      }
+    });
+  }, 200)
+);
 
 function activateFilter() {
   var filterCategory = event.target.parentNode.getAttribute("data-filter");
@@ -566,450 +701,19 @@ function enableFeatures() {
 ///////////////////////////////////////////////////////////////
 
 /////////////////////DESCRIPTION SPELL LINKS///////////////////
-var string = 'life only by means of a *[true resurrection](../true-resurrection/ "true resurrection (lvl 9)")* or a';
-var query = string.substring(string.indexOf("[") + 1, string.indexOf("]"));
-var shortcode = string.substring(string.indexOf("*"), string.indexOf("*", string.indexOf("*") + 1) + 1);
-var id = Math.floor(Math.random() * 1000000) + 1;
-// var spellLink = '<a href="#" class="spell_link">'+query+'</a>';
-console.log(shortcode);
-var type = "temp";
-fetchSpells(query, type, id);
-// console.log(string.substring(string.indexOf("*"), string.indexOf("*", string.indexOf("*") + 1)));
-// console.log(string.substring(string.indexOf("*"), string.indexOf("*", string.indexOf("*") + 1)));
-
-
-
-
-
-
-
-
-fetch("../spells.json")
-  .then((res) => res.json())
-  .then((data) => {
-    // let results = data.filter((x, index) => x.name.toLowerCase().includes(query.toLowerCase()));
-    let results = [];
-    let resultsIndex = [];
-    // console.log(data)
-    console.log(JSON.stringify(data).replace('*', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa'))
-    // data.forEach((e) => {
-      
-    //   if (e.description.includes('*[')) {
-    //     console.log(e.description);
-    //     e.description[prop].replace('*',);
-    //   }
-    // });
-    // console.log(results);
-  })
-  .catch(function (err) {
-    // There was an error
-    console.warn("Something went wrong.", err);
-  });
-
-
-
-
-
-
-
-
-
+// var id = Math.floor(Math.random() * 1000000) + 1;
+// var type = "temp";
+// fetchSpells(query, type, id);
 
 ///////////////////////////////////////////////////////////////
 
 ///////////////////SAVE TO LOCALSTORAGE FUNCTION///////////////
 function saveSpellSheet() {
-  if (activeSpellsJson.length) {
-    localStorage.setItem("activeSpells", JSON.stringify(activeSpellsJson));
+  // console.log(activeSpellsArray);
+  if (activeSpellsArray.length) {
+    localStorage.setItem("activeSpells", activeSpellsArray.toString());
+  } else {
+    localStorage.setItem("activeSpells", "");
   }
 }
 /////////////////////////////////////////////////////////////////
-
-// const spellNames = [
-//   "Acid Splash",
-//   "Alarm",
-//   "Animal Friendship",
-//   "Bane",
-//   "Blade Ward",
-//   "Bless",
-//   "Burning Hands",
-//   "Charm Person",
-//   "Chill Touch",
-//   "Chromatic Orb",
-//   "Color Spray",
-//   "Command",
-//   "Compelled Duel",
-//   "Comprehend Languages",
-//   "Create or Destroy Water",
-//   "Cure Wounds",
-//   "Dancing Lights",
-//   "Detect Evil and Good",
-//   "Detect Magic",
-//   "Detect Poison and Disease",
-//   "Disguise Self",
-//   "Divine Favor",
-//   "Dissonant Whispers",
-//   "Druidcraft",
-//   "Eldritch Blast",
-//   "Ensnaring Strike",
-//   "Entangle",
-//   "Faerie Fire",
-//   "Expeditious Retreat",
-//   "False Life",
-//   "Feather Fall",
-//   "Find Familiar",
-//   "Fire Bolt",
-//   "Fog Cloud",
-//   "Friends",
-//   "Goodberry",
-//   "Grease",
-//   "Guidance",
-//   "Guiding Bolt",
-//   "Hail of Thorns",
-//   "Healing Word",
-//   "Hellish Rebuke",
-//   "Hex",
-//   "Heroism",
-//   "Hunter's Mark",
-//   "Identify",
-//   "Illusory Script",
-//   "Inflict Wounds",
-//   "Jump",
-//   "Light",
-//   "Longstrider",
-//   "Mage Armor",
-//   "Mage Hand",
-//   "Magic Missile",
-//   "Mending",
-//   "Message",
-//   "Minor Illusion",
-//   "Poison Spray",
-//   "Prestidigitation",
-//   "Produce Flame",
-//   "Protection from Evil and Good",
-//   "Purify Food and Drink",
-//   "Ray of Frost",
-//   "Ray of Sickness",
-//   "Remove Curse",
-//   "Resistance",
-//   "Sacred Flame",
-//   "Sanctuary",
-//   "Shield of Faith",
-//   "Searing Smite",
-//   "Shield",
-//   "Shillelagh",
-//   "Shocking Grasp",
-//   "Silent Image",
-//   "Sleep",
-//   "Spare the Dying",
-//   "Speak with Animals",
-//   "Thaumaturgy",
-//   "Thorn Whip",
-//   "Thunderous Smite",
-//   "Thunderwave",
-//   "True Strike",
-//   "Unseen Servant",
-//   "Vicious Mockery",
-//   "Witch Bolt",
-//   "Wrathful Smite",
-//   "Aid",
-//   "Animal Messenger",
-//   "Blindness/Deafness",
-//   "Augury",
-//   "Calm Emotions",
-//   "Hold Person",
-//   "Lesser Restoration",
-//   "Prayer of Healing",
-//   "Silence",
-//   "Spiritual Weapon",
-//   "Warding Bond",
-//   "Animate Dead",
-//   "Arcane Eye",
-//   "Aura of Life",
-//   "Aura of Purity",
-//   "Aura Of Vitality",
-//   "Banishment",
-//   "Beacon of Hope",
-//   "Blight",
-//   "Bestow Curse",
-//   "Blinding Smite",
-//   "Blink",
-//   "Call Lightning",
-//   "Clairvoyance",
-//   "Cloud of Daggers",
-//   "Compulsion",
-//   "Conjure Animals",
-//   "Conjure Barrage",
-//   "Counterspell",
-//   "Create Food and Water",
-//   "Crusader's Mantle",
-//   "Daylight",
-//   "Dispel Magic",
-//   "Elemental Weapon",
-//   "Fear",
-//   "Feign Death",
-//   "Fireball",
-//   "Fly",
-//   "Gaseous Form",
-//   "Haste",
-//   "Hypnotic Pattern",
-//   "Lightning Arrow",
-//   "Magic Circle",
-//   "Major Image",
-//   "Mass Healing Word",
-//   "Alter Self",
-//   "Arcane Lock",
-//   "Barkskin",
-//   "Nondetection",
-//   "Meld into Stone",
-//   "Phantom Steed",
-//   "Plant Growth",
-//   "Protection from Energy",
-//   "Revivify",
-//   "Sending",
-//   "Sleet Storm",
-//   "Slow",
-//   "Speak with Dead",
-//   "Speak with Plants",
-//   "Spirit Guardians",
-//   "Stinking Cloud",
-//   "Confusion",
-//   "Conjure Minor Elementals",
-//   "Control Water",
-//   "Conjure Woodland Beings",
-//   "Death Ward",
-//   "Tongues",
-//   "Beast Sense",
-//   "Blur",
-//   "Branding Smite",
-//   "Cordon Of Arrows",
-//   "Crown of Madness",
-//   "Darkness",
-//   "Darkvision",
-//   "Detect Thoughts",
-//   "Animal Shapes",
-//   "Antimagic Field",
-//   "Antipathy/Sympathy",
-//   "Astral Projection",
-//   "Clone",
-//   "Control Weather",
-//   "Demiplane",
-//   "Dominate Monster",
-//   "Earthquake",
-//   "Feeblemind",
-//   "Foresight",
-//   "Gate",
-//   "Glibness",
-//   "Holy Aura",
-//   "Imprisonment",
-//   "Incendiary Cloud",
-//   "Mass Heal",
-//   "Maze",
-//   "Meteor Swarm",
-//   "Mind Blank",
-//   "Power Word Heal",
-//   "Power Word Kill",
-//   "Power Word Stun",
-//   "Prismatic Wall",
-//   "Shapechange",
-//   "Storm of Vengeance",
-//   "Telepathy",
-//   "Sunburst",
-//   "Time Stop",
-//   "True Polymorph",
-//   "Tsunami",
-//   "True Resurrection",
-//   "Weird",
-//   "Wish",
-//   "Conjure Celestial",
-//   "Delayed Blast Fireball",
-//   "Dimension Door",
-//   "Divine Word",
-//   "Etherealness",
-//   "Finger of Death",
-//   "Fire Storm",
-//   "Forcecage",
-//   "Mirage Arcane",
-//   "Prismatic Spray",
-//   "Project Image",
-//   "Plane Shift",
-//   "Regenerate",
-//   "Resurrection",
-//   "Reverse Gravity",
-//   "Sequester",
-//   "Simulacrum",
-//   "Symbol",
-//   "Teleport",
-//   "Suggestion",
-//   "Invisibility",
-//   "Animate Objects",
-//   "Antilife Shell",
-//   "Arcane Gate",
-//   "Awaken",
-//   "Banishing Smite",
-//   "Chain Lightning",
-//   "Blade Barrier",
-//   "Circle of Death",
-//   "Circle of Power",
-//   "Cloudkill",
-//   "Commune with Nature",
-//   "Commune",
-//   "Cone of Cold",
-//   "Conjure Elemental",
-//   "Conjure Fey",
-//   "Conjure Volley",
-//   "Contact Other Plane",
-//   "Contagion",
-//   "Contingency",
-//   "Create Undead",
-//   "Continual Flame",
-//   "Creation",
-//   "Destructive Wave",
-//   "Disintegrate",
-//   "Divination",
-//   "Dispel Evil and Good",
-//   "Dominate Beast",
-//   "Dominate Person",
-//   "Dream",
-//   "Enhance Ability",
-//   "Enlarge/Reduce",
-//   "Enthrall",
-//   "Fabricate",
-//   "Eyebite",
-//   "Find Steed",
-//   "Find the Path",
-//   "Find Traps",
-//   "Fire Shield",
-//   "Flame Blade",
-//   "Flame Strike",
-//   "Flaming Sphere",
-//   "Flesh to Stone",
-//   "Forbiddance",
-//   "Freedom of Movement",
-//   "Geas",
-//   "Gentle Repose",
-//   "Giant Insect",
-//   "Globe of Invulnerability",
-//   "Glyph of Warding",
-//   "Grasping Vine",
-//   "Greater Invisibility",
-//   "Greater Restoration",
-//   "Guardian of Faith",
-//   "Guards and Wards",
-//   "Gust of Wind",
-//   "Hallucinatory Terrain",
-//   "Hallow",
-//   "Harm",
-//   "Heat Metal",
-//   "Heal",
-//   "Heroes' Feast",
-//   "Hold Monster",
-//   "Ice Storm",
-//   "Insect Plague",
-//   "Knock",
-//   "Legend Lore",
-//   "Levitate",
-//   "Locate Animals or Plants",
-//   "Lightning Bolt",
-//   "Locate Creature",
-//   "Locate Object",
-//   "Magic Jar",
-//   "Magic Weapon",
-//   "Magic Mouth",
-//   "Mass Cure Wounds",
-//   "Mass Suggestion",
-//   "Mirror Image",
-//   "Mislead",
-//   "Misty Step",
-//   "Modify Memory",
-//   "Moonbeam",
-//   "Move Earth",
-//   "Pass without Trace",
-//   "Passwall",
-//   "Phantasmal Killer",
-//   "Phantasmal Force",
-//   "Planar Ally",
-//   "Planar Binding",
-//   "Polymorph",
-//   "Programmed Illusion",
-//   "Raise Dead",
-//   "Protection from Poison",
-//   "Ray of Enfeeblement",
-//   "Reincarnate",
-//   "Rope Trick",
-//   "Scorching Ray",
-//   "Scrying",
-//   "Seeming",
-//   "See Invisibility",
-//   "Shatter",
-//   "Spider Climb",
-//   "Spike Growth",
-//   "Staggering Smite",
-//   "Stone Shape",
-//   "Sunbeam",
-//   "Stoneskin",
-//   "Swift Quiver",
-//   "Telekinesis",
-//   "Teleportation Circle",
-//   "Transport via Plants",
-//   "Tree Stride",
-//   "True Seeing",
-//   "Vampiric Touch",
-//   "Wall of Fire",
-//   "Wall of Ice",
-//   "Wall of Force",
-//   "Wall of Stone",
-//   "Wall of Thorns",
-//   "Water Breathing",
-//   "Water Walk",
-//   "Web",
-//   "Wind Walk",
-//   "Wind Wall",
-//   "Word of Recall",
-//   "Zone of Truth",
-//   "Earth Tremor",
-//   "Pyrotechnics",
-//   "Skywrite",
-//   "Thunderclap",
-//   "Warding Wind",
-//   "Control Flames",
-//   "Create Bonfire",
-//   "Frostbite",
-//   "Gust",
-//   "Magic Stone",
-//   "Mold Earth",
-//   "Shape Water",
-//   "Absorb Elements",
-//   "Beast Bond",
-//   "Ice Knife",
-//   "Earthbind",
-//   "Dust Devil",
-//   "Catapult",
-//   "Control Winds",
-//   "Bones of the Earth",
-//   "Erupting Earth",
-//   "Elemental Bane",
-//   "Flame Arrows",
-//   "Investiture of Flame",
-//   "Investiture of Ice",
-//   "Investiture of Stone",
-//   "Investiture of Wind",
-//   "Maelstrom",
-//   "Primordial Ward",
-//   "Tidal Wave",
-//   "Transmute Rock",
-//   "Wall of Water",
-//   "Watery Sphere",
-//   "Whirlwind",
-//   "Immolation",
-//   "Storm Sphere",
-//   "Vitriolic Sphere",
-//   "Wall of Sand",
-// ];
-
-// let results = spellNames.filter((x) => x.toLowerCase().includes(("wate").toLowerCase()));
-// console.log(results)
-
-// searchFunction() {
-
-// }

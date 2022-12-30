@@ -7,12 +7,36 @@
 // font-size: 10px;
 // }
 
+:root {
+  --black: #000;
+  --white: #fff;
+  --accent: #EB2E17;
+}
+
 * {
   box-sizing: border-box;
   font-family: "Roboto", sans-serif;
   &.disabled {
     opacity: 0.25;
     pointer-events: none;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+a,
+p {
+  color: var(--black);
+}
+
+input {
+  color: var(--black);
+  &::placeholder {
+    color: var(--black);
   }
 }
 
@@ -28,22 +52,28 @@ h3 {
 
 html {
   &.dark {
-    filter: invert(1) contrast(0.8);
+    // filter: invert(1) contrast(0.8);
+    --black: #93a1a1;
+    --white: #002b36;
+    --accent: #cb4b16;
   }
+  background-color: var(--white);
 }
 
 .spell {
   list-style: none;
   padding: 1.5rem;
-  border: black 1px solid;
+  border: var(--black) 1px solid;
+  border-width: 1px;
   position: relative;
-  background-color: white;
+  background-color: var(--white);
   &:hover {
     .controls {
       display: block;
     }
   }
-  &.filter-hidden {
+  &.filter-hidden,
+  &.filter-hidden-by-name {
     display: none;
   }
   .controls {
@@ -57,7 +87,7 @@ html {
       // height: 40px;
       padding-left: 0.25rem;
       text-decoration: none;
-      color: black;
+      color: var(--black);
       display: inline-block;
       position: relative;
       i {
@@ -73,13 +103,13 @@ html {
         overflow: hidden;
         display: inline-block;
         white-space: nowrap;
-        background-color: white;
+        background-color: var(--white);
         text-align: right;
         pointer-events: none;
       }
       &:hover {
         i {
-          color: $accent;
+          color:  var(--accent);
         }
         span {
           width: 120px;
@@ -101,13 +131,17 @@ html {
     max-width: 600px;
   }
   .spell_inner {
+    .description_wrapper {
+      max-height: 200px;
+      overflow: auto;
+    }
     p {
       font-size: 0.9rem;
       &:not(:last-child) {
         margin-bottom: 0.5rem;
       }
-      &.description {
-        // display: none;
+      a.spell_link {
+        color: var(--black);
       }
     }
     h3 {
@@ -122,9 +156,9 @@ html {
         font-size: 1.1rem;
         color: grey;
         display: inline-block;
-        background-color: black;
+        background-color: var(--black);
         padding: 0.4rem 0.9rem;
-        color: white;
+        color: var(--white);
         i {
           font-size: 1.3rem;
           &:not(:first-of-type) {
@@ -142,10 +176,10 @@ html {
       &.large {
         margin-bottom: 0.5rem;
         li {
-          background-color: black;
-          color: white;
+          background-color: var(--black);
           p {
             font-size: 1.1rem;
+            color: var(--white);
             i {
               font-size: 1.3rem;
             }
@@ -155,6 +189,7 @@ html {
       &.small {
         margin-bottom: 1rem;
         li {
+          border-color: var(--black);
           p {
             i {
               vertical-align: -5px;
@@ -230,19 +265,21 @@ main {
           button,
           label {
             background-color: transparent;
-            border: 1px solid black;
+            border: 1px solid var(--black);
+            color: var(--black);
             border-radius: 0;
             display: inline-block;
             padding: 0.4rem 0.6rem;
             height: 38px;
+            background-color: var(--white);
             cursor: pointer;
             i {
               vertical-align: bottom;
             }
             &:hover {
-              background-color: $accent;
-              border-color: $accent;
-              color: white;
+              background-color:  var(--accent);
+              border-color:  var(--accent);
+              color: var(--white);
             }
           }
         }
@@ -250,7 +287,7 @@ main {
           a {
             font-size: 1rem;
             text-decoration: none;
-            color: black;
+            color: var(--black);
             i {
               font-size: 1.7rem;
               vertical-align: -4px;
@@ -258,7 +295,7 @@ main {
             }
             &:hover,
             &.active {
-              color: $accent;
+              color:  var(--accent);
             }
           }
           .visual_prefs {
@@ -266,12 +303,12 @@ main {
             #visual_prefs_panel {
               width: 200px;
               display: none;
-              border: 1px solid black;
+              border: 1px solid var(--black);
               position: absolute;
               top: 100%;
               right: 0;
               z-index: 3;
-              background-color: white;
+              background-color: var(--white);
               ul {
                 list-style: none;
                 padding: 1rem;
@@ -347,8 +384,12 @@ main {
             height: 50px;
             width: 100%;
             padding: 0 10px;
-            border: 1px solid black;
+            border: 1px solid var(--black);
+            background-color: var(--white);
             border-radius: 0;
+            &::placeholder {
+              color: var(--black);
+            }
           }
           ul#results {
             position: absolute;
@@ -370,12 +411,12 @@ main {
             li {
               width: 100%;
               border-bottom: lightgrey 1px solid;
-              background-color: white;
+              background-color: var(--white);
               a {
                 width: 100%;
                 padding: 0.2rem 10px;
                 height: auto;
-                color: black;
+                color: var(--black);
                 text-decoration: none;
                 display: block;
                 position: relative;
@@ -396,7 +437,7 @@ main {
                   font-size: 0.9rem;
                 }
                 &:hover {
-                  color: $accent;
+                  color:  var(--accent);
                   &:after {
                     opacity: 1;
                   }
@@ -432,7 +473,7 @@ main {
           input {
             font-size: 1rem;
             background-color: transparent;
-            border: 1px solid black;
+            border: 1px solid var(--black);
             display: inline-block;
             input {
               border: none;
@@ -444,23 +485,24 @@ main {
               font-size: 1.3rem;
               margin-left: 0.3rem;
               vertical-align: -5px;
+              color: var(--black);
             }
             a {
               padding: 0.435rem 0.6rem;
               display: inline-block;
-              color: black;
+              color: var(--black);
               text-decoration: none;
               &:hover {
-                background-color: $accent;
-                color: white;
+                background-color:  var(--accent);
+                color: var(--white);
               }
               &.active {
-                background-color: black;
-                color: white;
+                background-color: var(--black);
+                color: var(--white);
               }
             }
             &:hover {
-              border-color: $accent;
+              border-color:  var(--accent);
             }
             &.remove-filters {
               border-color: transparent !important;
@@ -490,7 +532,7 @@ main {
       margin-top: 0;
       .inner_box {
         width: 100%;
-        background-color: white;
+        background-color: var(--white);
         // padding: 3rem 0;
         max-width: 1600px;
         .spellsheet_wrapper {
@@ -500,7 +542,7 @@ main {
             display: block;
             position: sticky;
             top: 0;
-            background-color: white;
+            background-color: var(--white);
             z-index: 1;
           }
           .spells {
@@ -529,53 +571,56 @@ main {
               //   top: 0;
               //   height: 150px;
               //   width: 20px;
-              //   background-color: black;
+              //   background-color: var(--black);
               //   content: "cantrips";
-              //   color: white;
+              //   color: var(--white);
               //   writing-mode: vertical-lr;
               //   text-orientation: mixed;
               // }
             }
           }
         }
-        
       }
       .temp_spell_wrapper {
-            display: block;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(255,255,255,0.9);
-            z-index: 10;
-            #temp_spell {
-              position: relative;
-              width: 100%;
-              height: 100%;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              .spell {
-                width: 100%;
-                max-width: 600px;
-                background-color: white;
-                .controls {
-                  display: block;
-                  a {
-                    &.color_picker, &.moveup_spell, &.movedown_spell {
-                      display: none;
-                    }
-                    &.remove_spell {
-                      span {
-                        display: none;
-                      }
-                    }
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.9);
+        z-index: 10;
+        #temp_spell {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          .spell {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--white);
+            max-height: 90vh;
+            overflow: auto;
+            .controls {
+              display: block;
+              a {
+                &.color_picker,
+                &.moveup_spell,
+                &.movedown_spell {
+                  display: none;
+                }
+                &.remove_spell {
+                  span {
+                    display: none;
                   }
                 }
               }
             }
           }
+        }
+      }
     }
   }
 }
