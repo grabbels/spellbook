@@ -22,6 +22,7 @@ var darkButton = document.getElementById("dark_mode");
 var brightnessSlider = document.getElementById("brightness");
 var contrastSlider = document.getElementById("contrast");
 var headerLeft = document.querySelector("#header .header_left");
+const activeSpellsJson = [];
 
 //////////CHECK FOR VISUAL SETTINGS IN LOCALSTORAGE AND SET THEM///////
 if (localStorage.darkMode === "true") {
@@ -250,6 +251,8 @@ function addToSheet(e) {
     var spellLevel = e.level;
   }
   // console.log(spellLists);
+  activeSpellsJson.push(e);
+  console.log(activeSpellsJson);
   spellLists[spellLevel].appendChild(spell);
   hideShowLevels();
   bindRemoveMoveSpell(spell);
@@ -265,7 +268,24 @@ function bindRemoveMoveSpell(e) {
   });
   e.querySelector(".movedown_spell").addEventListener("click", () => {
     event.preventDefault();
-    e.parentNode.insertBefore(e.nextElementSibling, e);
+    console.log(activeSpellsJson);
+    var allSpellsHtml = document.querySelectorAll("li.spell");
+    // allSpellsHtml.forEach((el, index) => {
+    //   if (el === e) {
+    //     var oldIndex = index;
+    //   }
+    // });
+    var oldIndex = "";
+    Array.from(allSpellsHtml).some((el, index) => {
+      console.log(el);
+      oldIndex = index;
+      return el === e;
+    });
+    console.log(oldIndex);
+    var newIndex = oldIndex + 1;
+    console.log(newIndex);
+    var movedElement = activeSpellsJson.splice(oldIndex, 1);
+    console.log(movedElement);
     checkUpDownSetOrder();
   });
   e.querySelector(".moveup_spell").addEventListener("click", () => {
