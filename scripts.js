@@ -12,6 +12,7 @@
 //   });
 
 var searchBox = document.getElementById("spellsearch");
+var spellsLoading = document.getElementById("spells_loading");
 var resultsContainer = document.getElementById("results");
 var loadingAnimation = document.getElementById("loading");
 var allSpellLists = document.getElementById("spellsheet_wrapper");
@@ -30,6 +31,8 @@ var removeFilters = document.querySelectorAll(".remove-filters");
 var filtersBlock = document.getElementById("filters");
 var pageTitle = document.getElementById("page_title");
 var disabledMessage = document.getElementById("disabled_message");
+var bookmarksBar = document.getElementById("bookmarks");
+var bookmarks = bookmarksBar.querySelectorAll(".bookmark_inner:not(.icon)");
 const activeSpellsArray = [];
 var fromstorage = false;
 
@@ -64,7 +67,7 @@ if (localStorage.activeSpells) {
 }
 
 async function populateSpellsFromStorage(array, el) {
-  allSpellLists.style.display = "none";
+  spellsLoading.style.display = 'block';
   var type = el;
   if (!array) {
     var activeSpellsArray = localStorage.activeSpells.split(",");
@@ -73,12 +76,12 @@ async function populateSpellsFromStorage(array, el) {
   }
   for (var i = 0, len = activeSpellsArray.length; i < len; i++) {
     var query = activeSpellsArray[i];
-    fetchSpells(query, type, length);
+    fetchSpells(query, type, activeSpellsArray.length);
     await delay(50);
   }
 
   setTimeout(() => {
-    allSpellLists.style.display = "block";
+    spellsLoading.style.display = "none";
   }, 100);
 }
 
@@ -133,9 +136,10 @@ function fetchSpells(query, type, length) {
         }
       }
       if (type === "temp") {
-        addToSheet(results[0], type);
+        addToSheet(results[0], type, length);
       } else if (type === "direct" || type === "import") {
-        addToSheet(results[0], type);
+        addToSheet(results[0], type, length);
+        
       } else {
         if (results.length > 0) {
           results.forEach((e, index) => {
@@ -153,8 +157,11 @@ function fetchSpells(query, type, length) {
       }
     });
 }
-
-async function addToSheet(e, type) {
+var iteration = 0;
+async function addToSheet(e, type, length) {
+  if (length) {
+    iteration++
+  }
   const spell = document.createElement("li");
   if (type !== "import" && activeSpellsArray.includes(e.name)) {
     alert("This spell is already in your spellbook!");
@@ -318,9 +325,9 @@ async function addToSheet(e, type) {
     }
     spellLists[spellLevel].appendChild(spell);
     noSpells.style.display = "none";
-    hideShowLevels();
+    
     bindRemoveMoveSpell(spell);
-    checkUpDownSetOrder();
+
     if (descriptionSpellLinks) {
       spell.querySelectorAll("a.spell_link").forEach((e) => {
         e.addEventListener("click", () => {
@@ -331,8 +338,19 @@ async function addToSheet(e, type) {
         });
       });
     }
-    // console.log(activeSpellsArray);
-    saveSpellSheet();
+    if (length) {
+      if (iteration >= length) {
+        hideShowLevels();
+        checkUpDownSetOrder();
+        saveSpellSheet();
+        var length = '';
+        spellsLoading.style.display = 'none';
+      }
+    } else {
+      hideShowLevels();
+      checkUpDownSetOrder();
+      saveSpellSheet();
+    }
   }
 }
 
@@ -402,16 +420,15 @@ hideShowLevels();
 ///////////////////////HIDE AND SHOW SPELL LISTS/LEVELS///////////////
 function hideShowLevels() {
   spellLists.forEach((e) => {
-    // console.log(e + e.childNodes.length);
-    // console.log(e.previousElementSibling);
-    // console.log(e);
     if (e.querySelectorAll(".shown").length > 0) {
       e.style.display = "grid";
+      bookmarksBar.querySelector("[data-level='" + e.getAttribute("data-level") + "']").style.display = "block";
       if (e.previousElementSibling) {
         e.previousElementSibling.style.display = "block";
       }
     } else {
       e.style.display = "none";
+      bookmarksBar.querySelector("[data-level='" + e.getAttribute("data-level") + "']").style.display = "none";
       if (e.previousElementSibling) {
         e.previousElementSibling.style.display = "none";
       }
@@ -424,8 +441,10 @@ function hideShowLevels() {
   }, 10);
   if (activeSpellsArray.length < 1) {
     filtersBlock.classList.add("disabled");
+    bookmarksBar.style.display = "none";
   } else {
     filtersBlock.classList.remove("disabled");
+    bookmarksBar.style.display = "block";
   }
 }
 
@@ -474,7 +493,7 @@ document.getElementById("input-file").addEventListener("change", getFile);
 function getFile(event) {
   let text = "Importing a spellbook will overwrite your current spells. Do you want to continue?";
   if (confirm(text) == true) {
-    allSpellLists.style.display = "none";
+    spellsLoading.style.display = 'block';
     const input = event.target;
     if ("files" in input && input.files.length > 0) {
       spellLists.forEach((e) => {
@@ -655,17 +674,21 @@ function enableFeatures() {
 
 ///////////////////SAVE TO LOCALSTORAGE FUNCTION///////////////
 function saveSpellSheet() {
+  console.log('save called')
   // console.log(activeSpellsArray);
+  var activeSpellsArray = [];
+  var spells = document.querySelectorAll("li.spell");
+  if (spells) {
+    for (let i = 0; i < spells.length; i++) {
+      activeSpellsArray.push(spells[i].getAttribute("data-name"));
+    }
+  }
   if (activeSpellsArray.length) {
     localStorage.setItem("activeSpells", activeSpellsArray.toString());
   } else {
     localStorage.setItem("activeSpells", "");
   }
 }
+
+
 /////////////////////////////////////////////////////////////////
-
-
-
-var bookmarksBar = document.getElementById('bookmarks');
-var bookmarks = bookmarks.querySelectorAll('.bookmark')
-console.log(bookmarks)

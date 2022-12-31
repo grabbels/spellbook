@@ -46,11 +46,7 @@
                       <option value="soft">Soft</option>
                       <option value="curse">Curse</option>
                     </select>
-                    <!-- <a href="#" title="Enable dark mode" id="dark_mode"><i class="ri-moon-line"></i>Dark mode</a> -->
                   </li>
-                  <!-- <li class="brightness"><i class="ai-sun"></i><input id="brightness" type="range" value="100" min="10" max="100"></li>
-                  <li class="contrast"><i class="ai-circle"></i><i class="ai-circle-fill"></i><input id="contrast" type="range" value="100" min="10" max="100"></li> -->
-                  <li></li>
                 </ul>
               </div>
             </div>
@@ -97,55 +93,116 @@
         </div>
       </div>
       <div class="outer_box" id="spellsheet">
+        <div id="spells_loading">
+          <div class="loading_animation">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path
+                d="M6.94 14.036c-.233.624-.43 1.2-.606 1.783.96-.697 2.101-1.139 3.418-1.304 2.513-.314 4.746-1.973 5.876-4.058l-1.456-1.455 1.413-1.415 1-1.001c.43-.43.915-1.224 1.428-2.368-5.593.867-9.018 4.292-11.074 9.818zM17 9.001L18 10c-1 3-4 6-8 6.5-2.669.334-4.336 2.167-5.002 5.5H3C4 16 6 2 21 2c-1 2.997-1.998 4.996-2.997 5.997L17 9.001z"
+              />
+            </svg>
+          </div>
+        </div>
         <div class="inner_box">
           <div class="spellsheet_wrapper" id="spellsheet_wrapper">
-            <h2 data-level="0">Cantrips</h2>
-            <ul class="spells" data-level="0"></ul>
-            <h2 data-level="1">Level 1</h2>
-            <ul class="spells" data-level="1"></ul>
-            <h2 data-level="2">Level 2</h2>
-            <ul class="spells" data-level="2"></ul>
-            <h2 data-level="3">Level 3</h2>
-            <ul class="spells" data-level="3"></ul>
-            <h2 data-level="4">Level 4</h2>
-            <ul class="spells" data-level="4"></ul>
-            <h2 data-level="5">Level 5</h2>
-            <ul class="spells" data-level="5"></ul>
-            <h2 data-level="6">Level 6</h2>
-            <ul class="spells" data-level="6"></ul>
-            <h2 data-level="7">Level 7</h2>
-            <ul class="spells" data-level="7"></ul>
+            <div id="0">
+              <h2 data-level="0">Cantrips</h2>
+              <ul class="spells" data-level="0"></ul>
+            </div>
+            <div id="1">
+              <h2 data-level="1">Level 1</h2>
+              <ul class="spells" data-level="1"></ul>
+            </div>
+            <div id="2">
+              <h2 data-level="2">Level 2</h2>
+              <ul class="spells" data-level="2"></ul>
+            </div>
+            <div id="3">
+              <h2 data-level="3">Level 3</h2>
+              <ul class="spells" data-level="3"></ul>
+            </div>
+            <div id="4">
+              <h2 data-level="4">Level 4</h2>
+              <ul class="spells" data-level="4"></ul>
+            </div>
+            <div id="5">
+              <h2 data-level="5">Level 5</h2>
+              <ul class="spells" data-level="5"></ul>
+            </div>
+            <div id="6">
+              <h2 data-level="6">Level 6</h2>
+              <ul class="spells" data-level="6"></ul>
+            </div>
+            <div id="7">
+              <h2 data-level="7">Level 7</h2>
+              <ul class="spells" data-level="7"></ul>
+            </div>
+            <div id="8"></div>
             <h2 data-level="8">Level 8</h2>
             <ul class="spells" data-level="8"></ul>
+          </div>
+          <div id="9">
             <h2 data-level="9">Level 9</h2>
             <ul class="spells" data-level="9"></ul>
           </div>
           <div class="message" id="no_results_filtered">
-            <p>You filtered all your spells away :(<br>They're very scared. Bring them back, quickly!</p>
-            <p><a class="remove-filters" href='#'>Reset filters</a></p>
-          </div>
-          <div class="message" id="no_spells">
-            <p>Add some spells using the search box, or import your saved spellbook!</p>
-          </div>
+          <p>You filtered all your spells away :(<br />They're very scared. Bring them back, quickly!</p>
+          <p><a class="remove-filters" href="#">Reset filters</a></p>
         </div>
+        <div class="message" id="no_spells">
+          <p>Add some spells using the search box, or import your saved spellbook!</p>
+        </div>
+        </div>
+        
         <div class="temp_spell_wrapper">
-          <div id="temp_spell">
-          </div>
+          <div id="temp_spell"></div>
         </div>
         <div id="bookmarks">
-          <div data-level="0" class="bookmark"><div class="bookmark_inner"><p>C</p></div></div>
-          <div data-level="1" class="bookmark"><div class="bookmark_inner"><p>1</p></div></div>
-          <div data-level="2" class="bookmark"><div class="bookmark_inner"><p>2</p></div></div>
-          <div data-level="3" class="bookmark"><div class="bookmark_inner"><p>3</p></div></div>
-          <div data-level="4" class="bookmark"><div class="bookmark_inner"><p>4</p></div></div>
-          <div data-level="5" class="bookmark"><div class="bookmark_inner"><p>5</p></div></div>
-          <div data-level="6" class="bookmark"><div class="bookmark_inner"><p>6</p></div></div>
-          <div data-level="7" class="bookmark"><div class="bookmark_inner"><p>7</p></div></div>
-          <div data-level="8" class="bookmark"><div class="bookmark_inner"><p>8</p></div></div>
-          <div data-level="9" class="bookmark"><div class="bookmark_inner"><p>9</p></div></div>
+          <div class="bookmarks_wrapper">
+            <div class="bookmark icon">
+              <div class="bookmark_inner icon">
+                <p><i class="ri-bookmark-line"></i></p>
+              </div>
+            </div>
+            <div data-level="0" class="bookmark">
+              <a href="#0" data-level="0" class="bookmark_inner"><p>C</p></a>
+            </div>
+            <div data-level="1" class="bookmark">
+              <a href="#1" data-level="1" class="bookmark_inner"><p>1</p></a>
+            </div>
+            <div data-level="2" class="bookmark">
+              <a href="#2" data-level="2" class="bookmark_inner"><p>2</p></a>
+            </div>
+            <div data-level="3" class="bookmark">
+              <a href="#3" data-level="3" class="bookmark_inner"><p>3</p></a>
+            </div>
+            <div data-level="4" class="bookmark">
+              <a href="#4" data-level="4" class="bookmark_inner"><p>4</p></a>
+            </div>
+            <div data-level="5" class="bookmark">
+              <a href="#5" data-level="5" class="bookmark_inner"><p>5</p></a>
+            </div>
+            <div data-level="6" class="bookmark">
+              <a href="#6" data-level="6" class="bookmark_inner"><p>6</p></a>
+            </div>
+            <div data-level="7" class="bookmark">
+              <a href="#7" data-level="7" class="bookmark_inner"><p>7</p></a>
+            </div>
+            <div data-level="8" class="bookmark">
+              <a href="#8" data-level="8" class="bookmark_inner"><p>8</p></a>
+            </div>
+            <div data-level="9" class="bookmark">
+              <a href="#9" data-level="9" class="bookmark_inner"><p>9</p></a>
+            </div>
+          </div>
         </div>
       </div>
     </main>
     <script type="module" src="scripts.js"></script>
   </body>
+  <footer style="margin-top: 4rem; padding-bottom: 2rem">
+    <p style="text-align: center; font-size: 0.8rem">
+      See how it works on <a target="_blank" href="https://github.com/grabbels/spellbook">GitHub</a> | Made by <a target="_blank" href="https://semhak.com">Sem Hak</a>
+    </p>
+  </footer>
 </html>

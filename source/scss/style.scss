@@ -15,6 +15,7 @@
 }
 
 html {
+  scroll-behavior: smooth;
   background-color: var(--white);
   &.moss {
     --black: #93a1a1;
@@ -108,6 +109,10 @@ html {
     opacity: 0.25;
     pointer-events: none;
   }
+}
+
+main {
+  min-height: 100vh;
 }
 
 h1,
@@ -346,13 +351,17 @@ h3 {
 
 main {
   width: 100%;
-  padding: 1rem 3.5vw;
+
   .outer_box {
+    padding: 1rem 5vw;
     width: 100%;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     margin: 2rem 0;
+    @media only screen and (max-width: 1024px) {
+      padding: 1rem 3.5vw;
+    }
     &#header {
       width: 100%;
       height: 60px;
@@ -665,7 +674,73 @@ main {
       }
     }
     &#spellsheet {
+      position: relative;
+      display: grid;
       margin-top: 0;
+      // padding-left: 40px;
+      #spells_loading {
+        display: none;
+        position: absolute;
+        z-index: 8;
+        width: 100%;
+        height: 100%;
+        background-color: var(--white);
+        top: 0;
+        left: 0;
+        .loading_animation {
+          position: absolute;
+          top: 5rem;
+          left: 50%;
+          transform: translateX(calc(-50% - 27.5px));
+
+          svg {
+            display: block;
+            animation: scribble 1s;
+            animation-iteration-count: infinite;
+            fill: var(--black);
+            width: 50px;
+            height: 50px;
+            @keyframes scribble {
+              0% {
+                transform: translateX(0px) rotate(0deg);
+              }
+              5% {
+                transform: translateX(10px) rotate(3deg);
+              }
+              15% {
+                transform: translateX(15px) rotate(-3deg);
+              }
+              26% {
+                transform: translateX(20px) rotate(2deg);
+              }
+              30% {
+                transform: translateX(25px) rotate(0deg);
+              }
+              46% {
+                transform: translateX(30px) rotate(3deg);
+              }
+              50% {
+                transform: translateX(35px) rotate(-1deg);
+              }
+              64% {
+                transform: translateX(40px) rotate(2deg);
+              }
+              75% {
+                transform: translateX(45px) rotate(-3deg);
+              }
+              80% {
+                transform: translateX(50px) rotate(0deg);
+              }
+              84% {
+                transform: translateX(55px) rotate(2deg);
+              }
+              100% {
+                transform: translateX(0px) rotate(0deg);
+              }
+            }
+          }
+        }
+      }
       .inner_box {
         width: 100%;
         background-color: var(--white);
@@ -753,24 +828,52 @@ main {
         }
       }
       #bookmarks {
-        position: fixed;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 45px;
-        background-color: var(--black);
-        .bookmark {
-          width: 100%;
-          height: 45px;
-          .bookmark_inner {
+        grid-row: 1;
+        grid-column: 1;
+        position: sticky;
+        top: 1.5rem;
+        width: 4vw;
+        float: left;
+        height: 0;
+        z-index: 20;
+        margin-left: -4.5vw;
+        transform: translateY(1.5rem);
+        @media only screen and (max-width: 1024px) {
+        }
+        .bookmarks_wrapper {
+          position: relative;
+          height: auto;
+          display: flex;
+          flex-wrap: wrap;
+          align-content: center;
+          .bookmark {
             width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            p {
-              margin: 0;
-              color: var(--white);
+            height: 45px;
+            text-align: center;
+            .bookmark_inner {
+              aspect-ratio: 1/1;
+              // width: 100%;
+              height: 100%;
+              display: inline-flex;
+              justify-content: center;
+              align-items: center;
+              text-decoration: none;
+              background-color: var(--white);
+              p {
+                font-weight: 700;
+                margin: 0;
+                i {
+                  font-weight: 500;
+                }
+              }
+            }
+            &:hover:not(.icon) {
+              .bookmark_inner {
+                background-color: var(--accent);
+                p {
+                  color: var(--white);
+                }
+              }
             }
           }
         }
