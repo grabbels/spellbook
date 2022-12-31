@@ -17,6 +17,7 @@
   </head>
 
   <body>
+    <div id="disabled_message"><p>Most features are disabled while filters are active</p></div>
     <main>
       <div class="outer_box" id="header">
         <div class="inner_box">
@@ -31,11 +32,21 @@
           </div>
           <div class="header_right">
             <div class="visual_prefs">
-              <a class="menu_button" id="visual_prefs_button" title="Visual preferences" href="#"><i class="ri-sun-line"></i></a>
+              <a class="menu_button" id="visual_prefs_button" title="Visual preferences" href="#"><i class="ri-equalizer-line"></i></a>
               <div id="visual_prefs_panel">
                 <ul>
                   <li>
-                    <a href="#" title="Enable dark mode" id="dark_mode"><i class="ri-moon-line"></i>Dark mode</a>
+                    <label for="theme_select"><i class="ri-palette-line"></i></label>
+                    <select name="theme_select" id="theme_select">
+                      <option value="default" selected>Default</option>
+                      <option value="moss">Moss</option>
+                      <option value="solarized">Solarized</option>
+                      <option value="simple_dark">Simple dark</option>
+                      <option value="mana">Mana</option>
+                      <option value="soft">Soft</option>
+                      <option value="curse">Curse</option>
+                    </select>
+                    <!-- <a href="#" title="Enable dark mode" id="dark_mode"><i class="ri-moon-line"></i>Dark mode</a> -->
                   </li>
                   <!-- <li class="brightness"><i class="ai-sun"></i><input id="brightness" type="range" value="100" min="10" max="100"></li>
                   <li class="contrast"><i class="ai-circle"></i><i class="ai-circle-fill"></i><input id="contrast" type="range" value="100" min="10" max="100"></li> -->
@@ -48,7 +59,7 @@
       </div>
       <div class="outer_box" id="title">
         <div class="inner_box">
-          <h1><i class="ri-book-mark-line"></i> Inky's Tentacletastic Spellbook</h1>
+          <h1 id="page_title"><i class="ri-book-mark-line"></i> Inky's Tentacletastic Spellbook</h1>
         </div>
       </div>
       <div class="outer_box" id="search">
@@ -79,7 +90,7 @@
             <li class="filter" data-filter="name">
               <input type="text" id="name_filter" placeholder="search in spellbook..." />
             </li>
-            <li class="remove-filters" id="remove-filters">
+            <li class="remove-filters">
               <a href="#"><i class="ri-close-line"></i></a>
             </li>
           </ul>
@@ -109,10 +120,29 @@
             <h2 data-level="9">Level 9</h2>
             <ul class="spells" data-level="9"></ul>
           </div>
+          <div class="message" id="no_results_filtered">
+            <p>You filtered all your spells away :(<br>They're very scared. Bring them back, quickly!</p>
+            <p><a class="remove-filters" href='#'>Reset filters</a></p>
+          </div>
+          <div class="message" id="no_spells">
+            <p>Add some spells using the search box, or import your saved spellbook!</p>
+          </div>
         </div>
         <div class="temp_spell_wrapper">
           <div id="temp_spell">
           </div>
+        </div>
+        <div id="bookmarks">
+          <div data-level="0" class="bookmark"><div class="bookmark_inner"><p>C</p></div></div>
+          <div data-level="1" class="bookmark"><div class="bookmark_inner"><p>1</p></div></div>
+          <div data-level="2" class="bookmark"><div class="bookmark_inner"><p>2</p></div></div>
+          <div data-level="3" class="bookmark"><div class="bookmark_inner"><p>3</p></div></div>
+          <div data-level="4" class="bookmark"><div class="bookmark_inner"><p>4</p></div></div>
+          <div data-level="5" class="bookmark"><div class="bookmark_inner"><p>5</p></div></div>
+          <div data-level="6" class="bookmark"><div class="bookmark_inner"><p>6</p></div></div>
+          <div data-level="7" class="bookmark"><div class="bookmark_inner"><p>7</p></div></div>
+          <div data-level="8" class="bookmark"><div class="bookmark_inner"><p>8</p></div></div>
+          <div data-level="9" class="bookmark"><div class="bookmark_inner"><p>9</p></div></div>
         </div>
       </div>
     </main>

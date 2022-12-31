@@ -18,21 +18,26 @@ var allSpellLists = document.getElementById("spellsheet_wrapper");
 var spellLists = document.querySelectorAll("ul.spells");
 var prefsButton = document.getElementById("visual_prefs_button");
 var prefsPanel = document.getElementById("visual_prefs_panel");
-var darkButton = document.getElementById("dark_mode");
+var themeSelect = document.getElementById("theme_select");
 var brightnessSlider = document.getElementById("brightness");
 var contrastSlider = document.getElementById("contrast");
 var headerLeft = document.querySelector("#header .header_left");
 var tempSpellContainer = document.getElementById("temp_spell");
 var nameFilter = document.getElementById("name_filter");
+var noResultsFiltered = document.getElementById("no_results_filtered");
+var noSpells = document.getElementById("no_spells");
+var removeFilters = document.querySelectorAll(".remove-filters");
+var filtersBlock = document.getElementById("filters");
+var pageTitle = document.getElementById("page_title");
+var disabledMessage = document.getElementById("disabled_message");
 const activeSpellsArray = [];
 var fromstorage = false;
 
 //////////CHECK FOR VISUAL SETTINGS IN LOCALSTORAGE AND SET THEM///////
-if (localStorage.darkMode === "true") {
-  darkButton.classList.toggle("active");
-  darkButton.querySelector("i").classList.add("ri-moon-fill");
-  darkButton.querySelector("i").classList.remove("ri-moon-line");
-  document.documentElement.classList.toggle("dark");
+if (localStorage.theme) {
+  let savedTheme = localStorage.theme;
+  themeSelect.value = savedTheme;
+  document.documentElement.classList = savedTheme;
   resultsContainer.classList.toggle("dark");
 }
 ///////////////////////////////////////////////////////////////////////
@@ -43,52 +48,24 @@ prefsButton.addEventListener("click", () => {
   prefsButton.classList.toggle("active");
 });
 
-darkButton.addEventListener("click", () => {
-  darkButton.classList.toggle("active");
-  darkButton.querySelector("i").classList.toggle("ri-moon-fill");
-  darkButton.querySelector("i").classList.toggle("ri-moon-line");
-  document.documentElement.classList.toggle("dark");
-  resultsContainer.classList.toggle("dark");
-  if (document.documentElement.classList.contains("dark")) {
-    localStorage.setItem("darkMode", "true");
-  } else {
-    localStorage.setItem("darkMode", "false");
-  }
+themeSelect.addEventListener("change", () => {
+  let selectedTheme = themeSelect.value;
+  document.documentElement.classList = selectedTheme;
+  localStorage.setItem("theme", selectedTheme);
 });
+//////////////////////////////////////////////////////////////////////////
 
-// brightnessSlider.addEventListener('input', () => {
-//   document.documentElement.style.filter = 'brightness(' + (brightnessSlider.value * 0.01) + ') contrast(' + (contrastSlider.value * 0.01) + ')';
-// })
-// contrastSlider.addEventListener('input', () => {
-//   document.documentElement.style.filter = 'brightness(' + (brightnessSlider.value * 0.01) + ') contrast(' + (contrastSlider.value * 0.01) + ')';
-// })
-
-///////////////////////////////////////////////////////////////////////////
-
-// const test = async (_) => {
-//   const one = await getOne();
-//   console.log(one); // 1
-// };
-
-// test();
 ///////////////////////CHECK FOR LOCAL STORAGE SPELLSHEET//////////////////
 const delay = async (ms = 10) => new Promise((resolve) => setTimeout(resolve, ms));
 if (localStorage.activeSpells) {
-  populateSpellsFromStorage();
-  
-}
-// const activeSpellsArray = localStorage.activeSpells.split(",");
-// console.log(activeSpellsArray);
-// var length = activeSpellsArray.length;
-// var type = "direct";
-// for (var i = 0, len = activeSpellsArray.length; i < len; i++) {
-//   var query = activeSpellsArray[i];
-//   fetchSpells(query, type, length);
-// }
-// activeSpellsArray.length = 0;
-
-async function populateSpellsFromStorage(array) {
   var type = "direct";
+  var array = "";
+  populateSpellsFromStorage(array, type);
+}
+
+async function populateSpellsFromStorage(array, el) {
+  allSpellLists.style.display = "none";
+  var type = el;
   if (!array) {
     var activeSpellsArray = localStorage.activeSpells.split(",");
   } else {
@@ -97,42 +74,14 @@ async function populateSpellsFromStorage(array) {
   for (var i = 0, len = activeSpellsArray.length; i < len; i++) {
     var query = activeSpellsArray[i];
     fetchSpells(query, type, length);
-    await delay(10);
+    await delay(50);
   }
+
+  setTimeout(() => {
+    allSpellLists.style.display = "block";
+  }, 100);
 }
-// const delay = async (ms = 10) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// async function dopopulateSpellsFromStorage() {
-//   var type = "direct";
-//   const activeSpellsArray = localStorage.activeSpells.split(",");
-//   for (var i = 0, len = activeSpellsArray.length; i < len; i++) {
-//     var query = activeSpellsArray[i];
-//     await fetchSpellsDirect(query);
-//     console.log('done')
-//   }
-// }
-// dopopulateSpellsFromStorage();
-
-// function functionA() {
-//   return new Promise((resolve) => resolve(1));
-// }
-
-// function functionB() {
-//   return new Promise((resolve) => resolve(2));
-// }
-
-// function functionC(first, second) {
-//   return first + second;
-// }
-
-// functionA()
-//   .then((result) => Promise.all([result, functionB()]))
-//   .then(function ([first, second]) {
-//     return functionC(first, second);
-//   })
-//   .then((result) => {
-//     console.log(result);
-//   });
 ////////////////////////////////////////////////////////////////////////////
 
 document.querySelector("#clear").addEventListener("click", () => {
@@ -185,8 +134,8 @@ function fetchSpells(query, type, length) {
       }
       if (type === "temp") {
         addToSheet(results[0], type);
-      } else if (type === "direct") {
-        addToSheet(results[0], type, length);
+      } else if (type === "direct" || type === "import") {
+        addToSheet(results[0], type);
       } else {
         if (results.length > 0) {
           results.forEach((e, index) => {
@@ -205,9 +154,9 @@ function fetchSpells(query, type, length) {
     });
 }
 
-async function addToSheet(e, type, length) {
+async function addToSheet(e, type) {
   const spell = document.createElement("li");
-  if (activeSpellsArray.includes(e.name)) {
+  if (type !== "import" && activeSpellsArray.includes(e.name)) {
     alert("This spell is already in your spellbook!");
     return;
   }
@@ -264,7 +213,7 @@ async function addToSheet(e, type, length) {
   }
 
   var castingTime = e.casting_time;
-  spell.classList.add("spell");
+  spell.classList = "spell shown";
   spell.setAttribute("data-time", castingTime);
   spell.setAttribute("data-name", e.name);
   spell.setAttribute("data-range", e.range);
@@ -315,7 +264,7 @@ async function addToSheet(e, type, length) {
   // console.log(description)
 
   spell.innerHTML =
-    '<div class="spell_inner"><div class="controls"><a href="#" class="color_picker"><span>Change colors</span><i class="ri-paint-brush-line"></i></a><a href="#" class="moveup_spell"><span>Move spell up</span><i class="ri-arrow-up-s-line"></i></a><a href="#" class="movedown_spell"><span>Move spell down</span><i class="ri-arrow-down-s-line"></i></a><a href="#" class="remove_spell"><span>Remove spell</span><i class="ri-close-line"></i></a></div><h3><i class="' +
+    '<div class="spell_inner"><div class="controls"></i></a><a href="#" class="moveup_spell"><span>Move spell up</span><i class="ri-arrow-up-s-line"></i></a><a href="#" class="movedown_spell"><span>Move spell down</span><i class="ri-arrow-down-s-line"></i></a><a href="#" class="remove_spell"><span>Remove spell</span><i class="ri-close-line"></i></a></div><h3><i class="' +
     icon +
     '" title="' +
     e.school +
@@ -368,6 +317,7 @@ async function addToSheet(e, type, length) {
       activeSpellsArray.push(e.name);
     }
     spellLists[spellLevel].appendChild(spell);
+    noSpells.style.display = "none";
     hideShowLevels();
     bindRemoveMoveSpell(spell);
     checkUpDownSetOrder();
@@ -396,9 +346,11 @@ function bindRemoveMoveSpell(e) {
         break;
       }
     }
-    console.log(activeSpellsArray);
     e.remove();
     saveSpellSheet();
+    if (activeSpellsArray.length < 1) {
+      noSpells.style.display = "block";
+    }
     checkUpDownSetOrder();
     hideShowLevels();
   });
@@ -411,7 +363,6 @@ function bindRemoveMoveSpell(e) {
         break;
       }
     }
-    console.log(activeSpellsArray);
     e.parentNode.insertBefore(e.nextElementSibling, e);
     saveSpellSheet();
     checkUpDownSetOrder();
@@ -421,79 +372,14 @@ function bindRemoveMoveSpell(e) {
     for (var i = 0, len = activeSpellsArray.length; i < len; i++) {
       if (activeSpellsArray[i] === e.getAttribute("data-name")) {
         var movedSpell = activeSpellsArray.splice(i, 1);
-        console.log(movedSpell);
         activeSpellsArray.splice(i - 1, 0, movedSpell.toString());
         break;
       }
     }
-    console.log(activeSpellsArray);
     e.parentNode.insertBefore(e, e.previousElementSibling);
     saveSpellSheet();
     checkUpDownSetOrder();
   });
-
-  // ///////////////REMOVE SPELL FUNCTION///////////////////
-  // e.querySelector(".remove_spell").addEventListener("click", () => {
-  //   event.preventDefault();
-  //   var allSpellsHtml = document.querySelectorAll("li.spell");
-  //   var removedName = e.getAttribute('data-name')
-  //   console.log(activeSpellsJson)
-  //   activeSpellsJson.forEach((e, i)=>{
-  //     // console.log(i)
-  //     if (removedName === e.name) {
-  //       // activeSpellsJson[(i + 1)].remove();
-  //       console.log(i)
-  //       activeSpellsJson.splice(i,1)
-  //     }
-  //   })
-  //   console.log(activeSpellsJson);
-  //   // var toBeRemovedIndex = "";
-  //   // Array.from(allSpellsHtml).some((el, index) => {
-  //   //   toBeRemovedIndex = index;
-  //   //   return el === e;
-  //   // });
-  //   // console.log(activeSpellsJson);
-  //   // console.log(toBeRemovedIndex);
-  //   // console.log(activeSpellsJson[toBeRemovedIndex]);
-  //   // activeSpellsJson.splice((toBeRemovedIndex - 1), 1);
-  //   e.remove();
-
-  //   checkUpDownSetOrder();
-  //   hideShowLevels();
-  //   saveSpellSheet();
-  // });
-  // e.querySelector(".movedown_spell").addEventListener("click", () => {
-  //   event.preventDefault();
-  //   var allSpellsHtml = document.querySelectorAll("li.spell");
-  //   var oldIndex = "";
-  //   Array.from(allSpellsHtml).some((el, index) => {
-  //     oldIndex = index;
-  //     return el === e;
-  //   });
-  //   var newIndex = oldIndex + 1;
-  //   var movedElement = activeSpellsJson.splice(oldIndex, 1);
-  //   e.parentNode.insertBefore(e.nextElementSibling, e);
-  //   activeSpellsJson.splice(newIndex, 0, movedElement[0]);
-  //   // console.log(activeSpellsJson);
-  //   saveSpellSheet();
-  //   checkUpDownSetOrder();
-  // });
-  // e.querySelector(".moveup_spell").addEventListener("click", () => {
-  //   event.preventDefault();
-  //   var allSpellsHtml = document.querySelectorAll("li.spell");
-  //   var oldIndex = "";
-  //   Array.from(allSpellsHtml).some((el, index) => {
-  //     oldIndex = index;
-  //     return el === e;
-  //   });
-  //   var newIndex = oldIndex - 1;
-  //   var movedElement = activeSpellsJson.splice(oldIndex, 1);
-  //   e.parentNode.insertBefore(e, e.previousElementSibling);
-  //   activeSpellsJson.splice(newIndex, 0, movedElement[0]);
-  //   // console.log(activeSpellsJson);
-  //   saveSpellSheet();
-  //   checkUpDownSetOrder();
-  // });
 }
 function checkUpDownSetOrder() {
   document.querySelectorAll(".spell").forEach((e) => {
@@ -512,12 +398,14 @@ function checkUpDownSetOrder() {
   });
 }
 hideShowLevels();
+
+///////////////////////HIDE AND SHOW SPELL LISTS/LEVELS///////////////
 function hideShowLevels() {
   spellLists.forEach((e) => {
     // console.log(e + e.childNodes.length);
     // console.log(e.previousElementSibling);
     // console.log(e);
-    if (e.childNodes.length > 0) {
+    if (e.querySelectorAll(".shown").length > 0) {
       e.style.display = "grid";
       if (e.previousElementSibling) {
         e.previousElementSibling.style.display = "block";
@@ -529,6 +417,16 @@ function hideShowLevels() {
       }
     }
   });
+  setTimeout(() => {
+    if (allSpellLists.clientHeight < 10 && activeFilters.length > 0) {
+      noResultsFiltered.style.display = "block";
+    }
+  }, 10);
+  if (activeSpellsArray.length < 1) {
+    filtersBlock.classList.add("disabled");
+  } else {
+    filtersBlock.classList.remove("disabled");
+  }
 }
 
 searchBox.addEventListener("input", (e) => {
@@ -574,24 +472,27 @@ function downloadFile() {
 document.getElementById("input-file").addEventListener("change", getFile);
 
 function getFile(event) {
-  const input = event.target;
-  if ("files" in input && input.files.length > 0) {
-    spellLists.forEach((e) => {
-      console.log("emptying");
-      e.innerHTML = "";
-    });
-    const activeSpellsArray = [];
-    placeFileContent(activeSpellsArray, input.files[0]);
+  let text = "Importing a spellbook will overwrite your current spells. Do you want to continue?";
+  if (confirm(text) == true) {
+    allSpellLists.style.display = "none";
+    const input = event.target;
+    if ("files" in input && input.files.length > 0) {
+      spellLists.forEach((e) => {
+        e.innerHTML = "";
+      });
+      const activeSpellsArray = [];
+      placeFileContent(activeSpellsArray, input.files[0]);
+    }
   }
 }
 
 function placeFileContent(target, file) {
-  console.log("placing content");
   readFileContent(file)
     .then((content) => {
       const activeSpellsArray = content.toString();
-      console.log(activeSpellsArray)
-      populateSpellsFromStorage(activeSpellsArray);
+      saveSpellSheet();
+      var type = "import";
+      populateSpellsFromStorage(activeSpellsArray, type);
     })
     .catch((error) => alert(error));
 }
@@ -607,9 +508,15 @@ function readFileContent(file) {
 
 ////////////////FILTERS////////////////////////////////////////
 const activeFilters = [];
+
+//BIND REMOVE FILTERS
+for (var i = 0, len = removeFilters.length; i < len; i++) {
+  removeFilters[i].addEventListener("click", removeAllFilters);
+}
+
 let filters = document.querySelectorAll("#filters .filter a");
-filters.forEach((e) => {
-  e.addEventListener("click", (event) => {
+for (var i = 0, len = filters.length; i < len; i++) {
+  filters[i].addEventListener("click", (event) => {
     event.preventDefault();
     if (event.target.classList.contains("active")) {
       event.target.classList.remove("active");
@@ -626,29 +533,32 @@ filters.forEach((e) => {
             if (index > -1) {
               activeFilters.splice(index, 1);
             }
-            console.log(activeFilters);
             filterSpells();
           }
         });
       }
       activateFilter(event.target);
       disableFeatures();
-      document.getElementById("remove-filters").classList.add("active");
+      for (var i = 0, len = removeFilters.length; i < len; i++) {
+        removeFilters[i].classList.add("active");
+      }
     }
   });
-});
+}
 nameFilter.addEventListener(
   "input",
   debounce(() => {
-    console.log(nameFilter.value);
     var allSpellsHtml = document.querySelectorAll("li.spell");
-    allSpellsHtml.forEach((e) => {
-      if (!e.getAttribute("data-name").toLowerCase().includes(nameFilter.value.toLowerCase())) {
-        e.classList.add("filter-hidden-by-name");
+    for (var i = 0, len = allSpellsHtml.length; i < len; i++) {
+      if (!allSpellsHtml[i].getAttribute("data-name").toLowerCase().includes(nameFilter.value.toLowerCase())) {
+        allSpellsHtml[i].classList.add("filter-hidden-by-name");
       } else {
-        e.classList.remove("filter-hidden-by-name");
+        allSpellsHtml[i].classList.remove("filter-hidden-by-name");
       }
-    });
+    }
+    for (var i = 0, len = removeFilters.length; i < len; i++) {
+      removeFilters[i].classList.add("active");
+    }
   }, 200)
 );
 
@@ -666,11 +576,12 @@ function deactivateFilter() {
   if (index > -1) {
     activeFilters.splice(index, 1);
   }
-  console.log(activeFilters);
   filterSpells();
   if (activeFilters.length < 1) {
     enableFeatures();
-    document.getElementById("remove-filters").classList.remove("active");
+    for (var i = 0, len = removeFilters.length; i < len; i++) {
+      removeFilters[i].classList.remove("active");
+    }
   }
 }
 
@@ -678,24 +589,59 @@ function filterSpells() {
   document.querySelectorAll(".spell").forEach((e) => {
     if (activeFilters.length < 1) {
       e.classList.remove("filter-hidden");
+      e.classList.add("shown");
     } else {
       var elementData = JSON.stringify(e.dataset);
       if (!activeFilters.every((i) => elementData.includes(i))) {
         e.classList.add("filter-hidden");
+        e.classList.remove("shown");
       } else {
         e.classList.remove("filter-hidden");
+        e.classList.add("shown");
       }
     }
   });
+  hideShowLevels();
+}
+
+function removeAllFilters() {
+  for (var i = 0, len = filters.length; i < len; i++) {
+    filters[i].classList.remove("active");
+  }
+  var allSpellsHtml = document.querySelectorAll("li.spell");
+  for (var i = 0, len = allSpellsHtml.length; i < len; i++) {
+    allSpellsHtml[i].classList.remove("filter-hidden-by-name");
+  }
+
+  nameFilter.value = "";
+  activeFilters.length = 0;
+
+  filterSpells();
+  enableFeatures();
+  for (var i = 0, len = removeFilters.length; i < len; i++) {
+    removeFilters[i].classList.remove("active");
+  }
 }
 
 function disableFeatures() {
   headerLeft.classList.add("disabled");
   searchBox.classList.add("disabled");
+  pageTitle.classList.add("disabled");
+  disabledMessage.style.display = "block";
+  var controls = document.querySelectorAll(".controls");
+  for (let i = 0; i < controls.length; i++) {
+    controls[i].classList.add("disabled");
+  }
 }
 function enableFeatures() {
   headerLeft.classList.remove("disabled");
   searchBox.classList.remove("disabled");
+  pageTitle.classList.remove("disabled");
+  disabledMessage.style.display = "none";
+  var controls = document.querySelectorAll(".controls");
+  for (let i = 0; i < controls.length; i++) {
+    controls[i].classList.remove("disabled");
+  }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -717,3 +663,9 @@ function saveSpellSheet() {
   }
 }
 /////////////////////////////////////////////////////////////////
+
+
+
+var bookmarksBar = document.getElementById('bookmarks');
+var bookmarks = bookmarks.querySelectorAll('.bookmark')
+console.log(bookmarks)
