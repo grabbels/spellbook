@@ -423,6 +423,7 @@ function hideShowLevels() {
     if (e.querySelectorAll(".shown").length > 0) {
       e.style.display = "grid";
       bookmarksBar.querySelector("[data-level='" + e.getAttribute("data-level") + "']").style.display = "block";
+      noResultsFiltered.style.display = "none";
       if (e.previousElementSibling) {
         e.previousElementSibling.style.display = "block";
       }
