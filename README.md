@@ -30,7 +30,7 @@ Enjoy using this or just appreciate what I do? [Buy me a coffee](https://paypal.
 - Order spells using drag and drop 
 - Create apps for Android and iOS
 
-## To-do
+## Bugs
 - many (probably)
 You can help me by reporting bugs
 
