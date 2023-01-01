@@ -39,7 +39,7 @@ You can help me by reporting bugs
 - Vorpalhex for the [spells database](https://github.com/vorpalhex/srd_spells) 
 
 ## Changelog
-*V0.1.1*
+*V0.0.1*
 - Initial publish/beta version
 
 ## Licensing 
