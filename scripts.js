@@ -719,11 +719,11 @@ document.getElementById("export_pdf").addEventListener("click", () => {
 });
 
 function exportAsPDF() {
-  var blocker = document.createElement('div')
-  blocker.className = 'blocker';
+  var blocker = document.createElement("div");
+  blocker.className = "blocker";
   blocker.innerHTML = '<i class="ri-loader-4-line"></i>';
   document.documentElement.style.fontSize = "10px";
-  document.body.appendChild(blocker)
+  document.body.appendChild(blocker);
   let pageNumber = 0;
   var iterationCount = 0;
   let printLayoutWindow = document.createElement("div");
@@ -731,11 +731,12 @@ function exportAsPDF() {
   var printLayoutInner = document.createElement("div");
   printLayoutInner.classList.add("layout_inner");
   printLayoutWindow.appendChild(printLayoutInner);
-  document.body.appendChild(printLayoutWindow); 
+  document.body.appendChild(printLayoutWindow);
   var printLayoutInner = document.querySelectorAll("#print_layout_window .layout_inner");
   let currentSpells = document.querySelectorAll(".spell");
   for (let i = 0; i < currentSpells.length; i++) {
     let clone = currentSpells[i].cloneNode(true);
+    console.log(clone.getAttribute("data-level"));
     if (iterationCount === 8) {
       var newPageLayout = document.createElement("div");
       newPageLayout.classList.add("layout_inner");
@@ -746,9 +747,13 @@ function exportAsPDF() {
     }
     iterationCount++;
     printLayoutInner[pageNumber].appendChild(clone);
-    console.log(i)
-    console.log(currentSpells.length);
-    if (i === (currentSpells.length - 1)) {
+    var cloneName = clone.querySelector("h3").innerHTML;
+    var cloneLevel = "Level " + clone.getAttribute("data-level");
+    if (cloneLevel === 'Level cantrip') {
+      var cloneLevel = "Cantrip";
+    }
+    clone.querySelector("h3").innerHTML = cloneName + " <span>" + cloneLevel + "</span>";
+    if (i === currentSpells.length - 1) {
       setTimeout(() => {
         resizeAllGridItems();
         var opt = {

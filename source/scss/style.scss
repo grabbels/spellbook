@@ -371,19 +371,24 @@ h3 {
         vertical-align: bottom;
       }
       span {
-        font-size: 1.1rem;
-        color: grey;
-        display: inline-block;
-        background-color: var(--black);
-        padding: 0.4rem 0.9rem;
-        color: var(--white);
-        i {
-          font-size: 1.3rem;
-          &:not(:first-of-type) {
-            margin: 0 0.2rem 0 0.5rem;
-          }
-        }
+        font-size: 1.2rem;
+        font-weight: 700;
+        opacity: .5;
       }
+      // span {
+      //   font-size: 1.1rem;
+      //   color: grey;
+      //   display: inline-block;
+      //   background-color: var(--black);
+      //   padding: 0.4rem 0.9rem;
+      //   color: var(--white);
+      //   i {
+      //     font-size: 1.3rem;
+      //     &:not(:first-of-type) {
+      //       margin: 0 0.2rem 0 0.5rem;
+      //     }
+      //   }
+      // }
     }
     ul.terms {
       list-style: none;

@@ -42,6 +42,9 @@ You can help me by reporting bugs
 *V0.0.1*
 - Initial publish/beta version
 
+*V0.0.2*
+- Added level separators in PDF export
+
 ## Licensing 
 Open Game License v1.0a Copyright 2000, Wizards of the Coast, Inc.
 
