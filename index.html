@@ -21,6 +21,7 @@
     <main>
       <div class="outer_box" id="header">
         <div class="inner_box">
+          <a href="#" id="header_left_button"> <i class="ri-menu-2-line"></i> </a>
           <div class="header_left">
             <button><i class="ri-save-3-line"></i> Download</button>
             <button id="clear"><i class="ri-delete-bin-line"></i> Clear all</button>
@@ -56,7 +57,7 @@
       </div>
       <div class="outer_box" id="title">
         <div class="inner_box">
-          <h1 id="page_title"><i class="ri-quill-pen-line"></i> Inky's Tentacletastic Spellbook</h1><h5 style="text-align: center; font-weight: 500;">0.0.2 "much beta"</h5>
+          <h1 id="page_title"><i class="ri-quill-pen-line"></i> Inky's Tentacletastic Spellbook</h1><h5 style="text-align: center; font-weight: 500;">0.0.3 "favorite beta"</h5>
         </div>
       </div>
       <div class="outer_box" id="search">
@@ -68,6 +69,7 @@
           </div>
         </div>
       </div>
+      <div id="filters_button"><i class="ri-filter-line"></i></div>
       <div class="outer_box" id="filters">
         <div class="inner_box">
           <ul class="filters">
@@ -97,7 +99,7 @@
               <input type="text" id="name_filter" placeholder="search in spellbook..." />
             </li>
             <li class="remove-filters">
-              <a href="#"><i class="ri-close-line"></i></a>
+              <a href="#"><i class="ri-close-line"></i><span>Remove filters</span></a>
             </li>
           </ul>
         </div>
@@ -115,6 +117,10 @@
         </div>
         <div class="inner_box">
           <div class="spellsheet_wrapper" id="spellsheet_wrapper">
+            <div id="favorites">
+              <h2 data-level="favorites"><i class="ri-star-s-line"></i> Favorites</h2>
+              <ul class="spells favorites" data-level="favorites"></ul>
+            </div>
             <div id="0">
               <h2 data-level="0">Cantrips</h2>
               <ul class="spells" data-level="0"></ul>
@@ -177,6 +183,9 @@
               </div>
             </div>
             <div class="actual_bookmarks">
+              <div data-level="favorites" class="bookmark">
+                <a href="#favorites" data-level="favorites" class="bookmark_inner"><p><i class="ri-star-line"></i></p></a>
+              </div>
               <div data-level="0" class="bookmark">
                 <a href="#0" data-level="0" class="bookmark_inner"><p>C</p></a>
               </div>

@@ -10,19 +10,21 @@
 //   .then((data) => {
 //     let results = data.filter((x) => x.name.toLowerCase().includes("wate".toLowerCase()));
 //   });
-
 let searchBox = document.getElementById("spellsearch");
 let spellsLoading = document.getElementById("spells_loading");
 let resultsContainer = document.getElementById("results");
 let loadingAnimation = document.getElementById("loading");
 let allSpellLists = document.getElementById("spellsheet_wrapper");
-let spellLists = document.querySelectorAll("ul.spells");
+let spellLists = document.querySelectorAll("ul.spells:not(.favorites)");
 let prefsButton = document.getElementById("visual_prefs_button");
 let prefsPanel = document.getElementById("visual_prefs_panel");
 let themeSelect = document.getElementById("theme_select");
 let headerLeft = document.querySelector("#header .header_left");
+let headerLeftButton = document.getElementById("header_left_button");
 let tempSpellContainer = document.getElementById("temp_spell");
 let filters = document.querySelectorAll("#filters .filter a");
+let filtersButton = document.getElementById("filters_button");
+let filtersButtonIcon = filtersButton.querySelector("i");
 let nameFilter = document.getElementById("name_filter");
 let noResultsFiltered = document.getElementById("no_results_filtered");
 let noSpells = document.getElementById("no_spells");
@@ -32,10 +34,44 @@ let pageTitle = document.getElementById("title");
 let disabledMessage = document.getElementById("disabled_message");
 let bookmarksBar = document.getElementById("bookmarks");
 let bookmarks = bookmarksBar.querySelectorAll(".bookmark_inner:not(.icon)");
+let allBookmarks = bookmarksBar.querySelectorAll(".bookmark_inner");
 let bookmarksIcon = bookmarksBar.querySelector("#bookmarks .bookmark.icon");
 let actualBookmarks = bookmarksBar.querySelectorAll(".actual_bookmarks .bookmark");
+let favoriteSpells = document.querySelector("ul.favorites");
 const activeSpellsArray = [];
+const favoriteSpellsArray = [];
 let fromstorage = false;
+
+// console.log(localStorage.favoriteSpells)
+
+/////////bind relevant buttons and links/////////////
+
+document.addEventListener("touchstart", function () {
+  for (let i = 0; i < bookmarks.length; i++) {
+    bookmarks[i].addEventListener("click", () => {
+      bookmarksBar.classList.remove("hover");
+    });
+  }
+  bookmarksIcon.addEventListener("click", () => {
+    bookmarksBar.classList.toggle("hover");
+  });
+});
+
+headerLeftButton.addEventListener("click", () => {
+  headerLeft.classList.toggle("open");
+});
+
+filtersButton.addEventListener("click", () => {
+  filtersBlock.classList.toggle("open");
+  filtersButtonIcon.classList.toggle("ri-filter-line");
+  filtersButtonIcon.classList.toggle("ri-close-line");
+});
+
+headerLeft.addEventListener("click", () => {
+  headerLeft.classList.remove("open");
+});
+
+///////////////////////////////////////////////////////
 
 //////////CHECK FOR VISUAL SETTINGS IN LOCALSTORAGE AND SET THEM///////
 if (localStorage.theme) {
@@ -69,6 +105,7 @@ if (localStorage.activeSpells) {
 
 async function populateSpellsFromStorage(array, el) {
   spellsLoading.style.display = "block";
+
   var type = el;
   if (!array) {
     var activeSpellsArray = localStorage.activeSpells.split(",");
@@ -80,10 +117,20 @@ async function populateSpellsFromStorage(array, el) {
     fetchSpells(query, type, activeSpellsArray.length);
     await delay(50);
   }
+}
 
-  setTimeout(() => {
-    spellsLoading.style.display = "none";
-  }, 100);
+function populateFavorites() {
+  var favoriteSpellsArray = localStorage.favoriteSpells.split(",");
+  for (let i = 0; i < favoriteSpellsArray.length; i++) {
+    var favedSpell = document.querySelector('.spell[data-name="' + favoriteSpellsArray[i] + '"');
+    addRemoveFavorite(favedSpell);
+    bindRemoveMoveSpell(favedSpell);
+    console.log(i);
+    console.log(favoriteSpellsArray.length);
+    if (i === favoriteSpellsArray.length - 1) {
+      spellsLoading.style.display = "none";
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -272,7 +319,7 @@ async function addToSheet(e, type, length) {
   // console.log(description)
 
   spell.innerHTML =
-    '<div class="spell_inner"><div class="controls"></i></a><a href="#" class="moveup_spell"><span>Move spell up</span><i class="ri-arrow-up-s-line"></i></a><a href="#" class="movedown_spell"><span>Move spell down</span><i class="ri-arrow-down-s-line"></i></a><a href="#" class="remove_spell"><span>Remove spell</span><i class="ri-close-line"></i></a></div><h3><i class="' +
+    '<div class="spell_inner"><div class="controls"><a href="#" class="favorite_spell"><span>Add to favorites</span><i class="ri-star-s-line"></i></a><a href="#" class="moveup_spell"><span>Move spell up</span><i class="ri-arrow-up-s-line"></i></a><a href="#" class="movedown_spell"><span>Move spell down</span><i class="ri-arrow-down-s-line"></i></a><a href="#" class="remove_spell"><span>Remove spell</span><i class="ri-close-line"></i></a></div><h3><i class="' +
     icon +
     '" title="' +
     e.school +
@@ -313,39 +360,62 @@ async function addToSheet(e, type, length) {
     tempSpellContainer.parentElement.style.display = "block";
     document.body.style.position = "fixed";
     document.body.style.overflowY = "scroll";
+
     spell.querySelector(".remove_spell").addEventListener("click", (e) => {
       event.preventDefault();
       spell.remove();
       tempSpellContainer.parentElement.style.display = "none";
       document.body.style.position = "static";
       document.body.style.overflowY = "auto";
+
+      let savedScrollPosition = document.documentElement.getAttribute("data-scroll");
+      document.documentElement.style.scrollBehavior = "auto";
+      window.scrollTo(0, savedScrollPosition);
+      document.documentElement.style.scrollBehavior = "smooth";
     });
   } else {
     if (!activeSpellsArray.includes(e.name)) {
       activeSpellsArray.push(e.name);
     }
     spellLists[spellLevel].appendChild(spell);
+    // document.addEventListener("touchstart", function () {
+    //   spell.addEventListener('click', ()=>{
+
+    //     if (event.target instanceof HTMLAnchorElement) {
+    //       console.log('link')
+    //     } else {
+    //       // spell.classList.toggle("hover");
+    //     }
+    //   })
+    // });
     noSpells.style.display = "none";
-
     bindRemoveMoveSpell(spell);
-
     if (descriptionSpellLinks) {
-      spell.querySelectorAll("a.spell_link").forEach((e) => {
-        e.addEventListener("click", () => {
+      var descriptionLinks = spell.querySelectorAll("a.spell_link");
+      for (let i = 0; i < descriptionLinks.length; i++) {
+        descriptionLinks[i].addEventListener("click", () => {
           event.preventDefault();
-          var query = e.innerHTML;
+          document.documentElement.setAttribute("data-scroll", window.scrollY);
+          var query = descriptionLinks[i].innerHTML;
           var type = "temp";
           fetchSpells(query, type);
         });
-      });
+      }
     }
     if (length) {
       if (iteration >= length) {
         hideShowLevels();
         checkUpDownSetOrder();
-        saveSpellSheet();
+        if (localStorage.favoriteSpells) {
+          populateFavorites();
+        } else {
+          saveSpellSheet();
+          spellsLoading.style.display = "none";
+        }
+
         var length = "";
-        spellsLoading.style.display = "none";
+        // populateFavorites();
+        // spellsLoading.style.display = "none";
       }
     } else {
       hideShowLevels();
@@ -355,8 +425,61 @@ async function addToSheet(e, type, length) {
   }
 }
 
+function addRemoveFavorite(e) {
+  if (e.classList.contains("favorite") || e.classList.contains("in_favorites")) {
+    if (e.classList.contains("favorite")) {
+      event.target.lastChild.classList.remove("ri-star-s-fill");
+      event.target.lastChild.classList.add("ri-star-s-line");
+      event.target.firstChild.innerHTML = "Add to favorites";
+      let unfavSpellName = e.getAttribute("data-name");
+      e.remove();
+      document.querySelector('.spell[data-name="' + unfavSpellName + '"] .favorite_spell i').classList.remove("ri-star-s-fill");
+      document.querySelector('.spell[data-name="' + unfavSpellName + '"] .favorite_spell i').classList.add("ri-star-s-line");
+      document.querySelector('.spell[data-name="' + unfavSpellName + '"]').classList.remove("in_favorites");
+    } else if (e.classList.contains("in_favorites")) {
+      event.target.lastChild.classList.remove("ri-star-s-fill");
+      event.target.lastChild.classList.add("ri-star-s-line");
+      event.target.firstChild.innerHTML = "Add to favorites";
+      let unfavSpellName = e.getAttribute("data-name");
+      document.querySelector('.spell.favorite[data-name="' + unfavSpellName + '"] .favorite_spell i').classList.remove("ri-star-s-fill");
+      document.querySelector('.spell.favorite[data-name="' + unfavSpellName + '"] .favorite_spell i').classList.add("ri-star-s-line");
+      document.querySelector('.spell.favorite[data-name="' + unfavSpellName + '"]').remove();
+      e.classList.remove("in_favorites");
+    }
+  } else {
+    if (event) {
+      var element = event.target;
+    } else {
+      var element = e.querySelector(".favorite_spell");
+    }
+    element.lastChild.classList.add("ri-star-s-fill");
+    element.lastChild.classList.remove("ri-star-s-line");
+    element.firstChild.innerHTML = "Remove from favorites";
+    var fav = e.cloneNode(true);
+    favoriteSpellsArray.push(fav.getAttribute("data-name"));
+    var cloneName = fav.querySelector("h3").innerHTML;
+    var cloneLevel = "Level " + fav.getAttribute("data-level");
+    if (cloneLevel === "Level cantrip") {
+      var cloneLevel = "Cantrip";
+    }
+    fav.classList.add("favorite");
+    fav.querySelector("h3").innerHTML = cloneName + " <span>" + cloneLevel + "</span>";
+    favoriteSpells.appendChild(fav);
+    bindRemoveMoveSpell(fav);
+    e.classList.add("in_favorites");
+  }
+  saveSpellSheet();
+  checkUpDownSetOrder();
+  hideShowLevels();
+}
+
 function bindRemoveMoveSpell(e) {
-  ///////////////REMOVE SPELL FUNCTION///////////////////
+  //bind favorite spell button and function
+  e.querySelector(".favorite_spell").addEventListener("click", () => {
+    event.preventDefault();
+    addRemoveFavorite(e);
+  });
+  //bind remove spell button and function
   e.querySelector(".remove_spell").addEventListener("click", () => {
     event.preventDefault();
     for (var i = 0, len = activeSpellsArray.length; i < len; i++) {
@@ -373,6 +496,7 @@ function bindRemoveMoveSpell(e) {
     checkUpDownSetOrder();
     hideShowLevels();
   });
+  //bind move spell down button and function
   e.querySelector(".movedown_spell").addEventListener("click", () => {
     event.preventDefault();
     for (var i = 0, len = activeSpellsArray.length; i < len; i++) {
@@ -386,6 +510,7 @@ function bindRemoveMoveSpell(e) {
     saveSpellSheet();
     checkUpDownSetOrder();
   });
+  //bind move spell up button and function
   e.querySelector(".moveup_spell").addEventListener("click", () => {
     event.preventDefault();
     for (var i = 0, len = activeSpellsArray.length; i < len; i++) {
@@ -420,22 +545,31 @@ hideShowLevels();
 
 ///////////////////////HIDE AND SHOW SPELL LISTS/LEVELS///////////////
 function hideShowLevels() {
-  spellLists.forEach((e) => {
-    if (e.querySelectorAll(".shown").length > 0) {
-      e.style.display = "grid";
-      bookmarksBar.querySelector("[data-level='" + e.getAttribute("data-level") + "']").style.display = "block";
+  for (let i = 0; i < spellLists.length; i++) {
+    if (spellLists[i].querySelectorAll(".shown").length > 0) {
+      spellLists[i].style.display = "grid";
+      bookmarksBar.querySelector("[data-level='" + spellLists[i].getAttribute("data-level") + "']").style.display = "block";
       noResultsFiltered.style.display = "none";
-      if (e.previousElementSibling) {
-        e.previousElementSibling.style.display = "block";
+      if (spellLists[i].previousElementSibling) {
+        spellLists[i].previousElementSibling.style.display = "block";
       }
     } else {
-      e.style.display = "none";
-      bookmarksBar.querySelector("[data-level='" + e.getAttribute("data-level") + "']").style.display = "none";
-      if (e.previousElementSibling) {
-        e.previousElementSibling.style.display = "none";
+      spellLists[i].style.display = "none";
+      bookmarksBar.querySelector("[data-level='" + spellLists[i].getAttribute("data-level") + "']").style.display = "none";
+      if (spellLists[i].previousElementSibling) {
+        spellLists[i].previousElementSibling.style.display = "none";
       }
     }
-  });
+  }
+  if (favoriteSpells.childElementCount < 1) {
+    favoriteSpells.style.display = "none";
+    favoriteSpells.previousElementSibling.style.display = "none";
+    bookmarksBar.querySelector("[data-level='favorites']").style.display = "none";
+  } else {
+    favoriteSpells.style.display = "grid";
+    favoriteSpells.previousElementSibling.style.display = "block";
+    bookmarksBar.querySelector("[data-level='favorites']").style.display = "block";
+  }
   setTimeout(() => {
     if (allSpellLists.clientHeight < 10 && activeFilters.length > 0) {
       noResultsFiltered.style.display = "block";
@@ -443,9 +577,11 @@ function hideShowLevels() {
   }, 10);
   if (activeSpellsArray.length < 1) {
     filtersBlock.classList.add("disabled");
+    filtersButton.classList.add("disabled");
     bookmarksBar.style.display = "none";
   } else {
     filtersBlock.classList.remove("disabled");
+    filtersButton.classList.remove("disabled");
     bookmarksBar.style.display = "block";
   }
   bookmarksIcon.style.display = "none";
@@ -485,13 +621,15 @@ function downloadFile() {
   const activeSpellsSave = localStorage.activeSpells;
   let a = document.createElement("a");
   var name = prompt("Filename:");
-  if (typeof a.download !== "undefined") a.download = name + ".json";
-  a.href = URL.createObjectURL(
-    new Blob([activeSpellsSave], {
-      type: "application/octet-stream",
-    })
-  );
-  a.dispatchEvent(new MouseEvent("click"));
+  if (name !== null) {
+    if (typeof a.download !== "undefined") a.download = name + ".json";
+    a.href = URL.createObjectURL(
+      new Blob([activeSpellsSave], {
+        type: "application/octet-stream",
+      })
+    );
+    a.dispatchEvent(new MouseEvent("click"));
+  }
 }
 
 ////////////////////SAVE FILE UPLOAD/IMPORT/////////////////
@@ -662,10 +800,12 @@ function removeAllFilters() {
   for (var i = 0, len = removeFilters.length; i < len; i++) {
     removeFilters[i].classList.remove("active");
   }
+  filtersBlock.classList.remove("open");
 }
 
 function disableFeatures() {
   headerLeft.classList.add("disabled");
+  headerLeftButton.classList.add("disabled");
   searchBox.classList.add("disabled");
   pageTitle.classList.add("disabled");
   disabledMessage.style.display = "block";
@@ -676,6 +816,7 @@ function disableFeatures() {
 }
 function enableFeatures() {
   headerLeft.classList.remove("disabled");
+  headerLeftButton.classList.remove("disabled");
   searchBox.classList.remove("disabled");
   pageTitle.classList.remove("disabled");
   disabledMessage.style.display = "none";
@@ -695,14 +836,21 @@ function enableFeatures() {
 ///////////////////////////////////////////////////////////////
 
 ///////////////////SAVE TO LOCALSTORAGE FUNCTION///////////////
+
 function saveSpellSheet() {
-  console.log("save called");
-  // console.log(activeSpellsArray);
+  console.log("save action was called");
   var activeSpellsArray = [];
-  var spells = document.querySelectorAll("li.spell");
+  var spells = document.querySelectorAll("li.spell:not(.favorite)");
   if (spells) {
     for (let i = 0; i < spells.length; i++) {
       activeSpellsArray.push(spells[i].getAttribute("data-name"));
+    }
+  }
+  var favoriteSpellsArray = [];
+  var favSpells = document.querySelectorAll("li.spell.favorite");
+  if (spells) {
+    for (let i = 0; i < favSpells.length; i++) {
+      favoriteSpellsArray.push(favSpells[i].getAttribute("data-name"));
     }
   }
   if (activeSpellsArray.length) {
@@ -710,10 +858,16 @@ function saveSpellSheet() {
   } else {
     localStorage.setItem("activeSpells", "");
   }
+  if (favoriteSpellsArray.length) {
+    localStorage.setItem("favoriteSpells", favoriteSpellsArray.toString());
+  } else {
+    localStorage.setItem("favoriteSpells", "");
+  }
 }
 
 /////////////////////////////////////////////////////////////////
 
+///////////////////////PDF FUNCTIONALITY//////////////////////////
 document.getElementById("export_pdf").addEventListener("click", () => {
   exportAsPDF();
 });
@@ -724,59 +878,73 @@ function exportAsPDF() {
   blocker.innerHTML = '<i class="ri-loader-4-line"></i>';
   document.documentElement.style.fontSize = "10px";
   document.body.appendChild(blocker);
-  let pageNumber = 0;
+  var pageNumber = 0;
   var iterationCount = 0;
-  let printLayoutWindow = document.createElement("div");
+  var printLayoutWindow = document.createElement("div");
   printLayoutWindow.id = "print_layout_window";
-  var printLayoutInner = document.createElement("div");
-  printLayoutInner.classList.add("layout_inner");
-  printLayoutWindow.appendChild(printLayoutInner);
+  window.printLayoutInner = document.createElement("div");
+  window.printLayoutInner.classList.add("layout_inner");
+  printLayoutWindow.appendChild(window.printLayoutInner);
   document.body.appendChild(printLayoutWindow);
-  var printLayoutInner = document.querySelectorAll("#print_layout_window .layout_inner");
-  let currentSpells = document.querySelectorAll(".spell");
-  for (let i = 0; i < currentSpells.length; i++) {
-    let clone = currentSpells[i].cloneNode(true);
-    console.log(clone.getAttribute("data-level"));
-    if (iterationCount === 8) {
-      var newPageLayout = document.createElement("div");
-      newPageLayout.classList.add("layout_inner");
-      printLayoutWindow.appendChild(newPageLayout);
-      var printLayoutInner = document.querySelectorAll("#print_layout_window .layout_inner");
-      pageNumber++;
-      iterationCount = 0;
-    }
-    iterationCount++;
-    printLayoutInner[pageNumber].appendChild(clone);
-    var cloneName = clone.querySelector("h3").innerHTML;
-    var cloneLevel = "Level " + clone.getAttribute("data-level");
-    if (cloneLevel === 'Level cantrip') {
-      var cloneLevel = "Cantrip";
-    }
-    clone.querySelector("h3").innerHTML = cloneName + " <span>" + cloneLevel + "</span>";
-    if (i === currentSpells.length - 1) {
-      setTimeout(() => {
-        resizeAllGridItems();
-        var opt = {
-          margin: 0,
-          filename: "spellbook.pdf",
-          image: { type: "jpeg", quality: 98 },
-          html2canvas: { scale: 2.5, y: 30, x: 449 },
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-          pagebreak: { mode: "legacy" },
-        };
-        html2pdf()
-          .set(opt)
-          .from(printLayoutWindow)
-          .save()
-          .then(() => {
-            console.log("done");
-            printLayoutWindow.remove();
-            blocker.remove();
-            document.documentElement.style.fontSize = "16px";
-          });
-      }, 100);
+  window.printLayoutInner = document.querySelectorAll("#print_layout_window .layout_inner");
+  window.currentSpells = document.querySelectorAll(".spell.favorite");
+  window.currentType = 'favorite';
+  renderSpells();
+  function renderSpells() {
+    for (let i = 0; i < window.currentSpells.length; i++) {
+      let clone = window.currentSpells[i].cloneNode(true);
+      if (iterationCount === 8) {
+        var newPageLayout = document.createElement("div");
+        newPageLayout.classList.add("layout_inner");
+        printLayoutWindow.appendChild(newPageLayout);
+        window.printLayoutInner = document.querySelectorAll("#print_layout_window .layout_inner");
+        pageNumber++;
+        iterationCount = 0;
+      }
+      iterationCount++;
+      window.printLayoutInner[pageNumber].appendChild(clone);
+      var cloneName = clone.querySelector("h3").innerHTML;
+      var cloneLevel = "Level " + clone.getAttribute("data-level");
+      if (cloneLevel === "Level cantrip") {
+        var cloneLevel = "Cantrip";
+      }
+      clone.querySelector("h3").innerHTML = cloneName + " <span>" + cloneLevel + "</span>";
+      if (i === window.currentSpells.length - 1 && window.currentType === "normal") {
+        console.log('all done')
+        setTimeout(() => {
+          html2pdffunction();
+        }, 100);
+      } else if (i === window.currentSpells.length - 1) {
+        console.log('favorites done')
+        window.currentType = "normal";
+        window.currentSpells = document.querySelectorAll(".spell:not(.favorite)");
+        renderSpells();
+      }
     }
   }
+}
+
+function html2pdffunction() {
+  // resizeAllGridItems();
+  console.log('test')
+  var opt = {
+    margin: 0,
+    filename: "spellbook.pdf",
+    image: { type: "jpeg", quality: 98 },
+    html2canvas: { scale: 2.5, y: 30, x: 449 },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    pagebreak: { mode: "legacy" },
+  };
+  html2pdf()
+    .set(opt)
+    .from(window.printLayoutWindow)
+    .save()
+    .then(() => {
+      console.log("done");
+      window.printLayoutWindow.remove();
+      blocker.remove();
+      document.documentElement.style.fontSize = "16px";
+    });
 }
 
 function resizeGridItem(item) {
