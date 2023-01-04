@@ -39,6 +39,10 @@ You can help me by reporting bugs
 - Vorpalhex for the [spells database](https://github.com/vorpalhex/srd_spells) 
 
 ## Changelog
+*V0.0.4 "Clairvoyance"*
+- Various bugfixes
+- Added spell property names on mouseover/touch
+
 *V0.0.3 "Swift Quiver"*
 - Bug fixes
 - Favorites functionality added
