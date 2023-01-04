@@ -1,4 +1,4 @@
-# Inky's Tantacletastic Spellbook
+# Inky's Tentacletastic Spellbook
 As I grew more and more annoyed with missing information on the classic D&D 5e spellsheet I started thinking about a possible alternative. And as things go: it got out of hand pretty quickly. Now, this turned into a fully fledged spell-manager for 5e D&D. Very much in progress, check the feature-list and to-do list for current and upcoming planned functionalities!
 
 Play around with the live spellbook here: [spellbook.semhak.dev](https://spellbook.semhak.dev)
