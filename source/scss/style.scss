@@ -273,6 +273,10 @@ h3 {
         }
       }
     }
+    &.favorites {
+      height: 285mm;
+      margin-top: 12mm;
+    }
   }
 }
 
@@ -306,6 +310,10 @@ h3 {
     @media only screen and (max-width: 600px) {
       top: 1rem;
       right: 1rem;
+    }
+    @media (pointer: coarse) {
+      transform: scale(1.3) translateY(-3px);
+      transform-origin: top right;
     }
     // &.disabled {
     //   opacity: 0;
@@ -351,6 +359,16 @@ h3 {
           }
         }
       }
+      &.note_spell {
+        span {
+          top: 3px;
+        }
+        i {
+          font-size: 1.2rem;
+          vertical-align: 2px;
+          margin-right: 0.2rem;
+        }
+      }
     }
   }
   &:only-child {
@@ -361,9 +379,9 @@ h3 {
     //   display: table;
     // }
     .description_wrapper {
-      max-height: 200px;
+      max-height: 150px;
       overflow: auto;
-
+      position: relative;
       @media print {
         max-height: none;
       }
@@ -405,6 +423,37 @@ h3 {
       //   }
       // }
     }
+    .notes {
+      margin-top: .5rem;
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px dashed var(--accent);
+      textarea {
+        width: 100%;
+        resize: none;
+        font-size: .9rem;
+        border-radius: 0;
+        border: 1px solid var(--black);
+      }
+      button {
+        border: 1px solid var(--accent);
+        &:hover {
+          border-color: var(--accent);
+          background-color: var(--accent);
+          color: var(--white);
+        }
+      }
+      p {
+        white-space: pre-wrap;
+        &:first-child {
+          margin-bottom: 0;
+          color: var(--accent);
+        }
+        &.notes_inner {
+          margin-top: 0;
+        }
+      }
+    }
     ul.terms {
       list-style: none;
       padding: 0;
@@ -441,6 +490,13 @@ h3 {
               i {
                 font-size: 1rem;
                 vertical-align: -2px;
+              }
+            }
+          }
+          &.duration {
+            i.ri-download-fill {
+              &::before {
+                transform: rotate(180deg);
               }
             }
           }
@@ -1053,14 +1109,26 @@ main {
               .spell {
                 .spell_inner {
                   .controls {
-                    .remove_spell {
+                    .remove_spell, .note_spell {
                       display: none;
                     }
                   }
                   .description_wrapper {
-                    height: 0;
-                    overflow: hidden;
+                    display: none;
                   }
+                  .notes {
+                    display: none!important;
+                  }
+                  .higher-level {
+                    display: none;
+                  }
+                }
+                .spell_link.cover {
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  height: 100%;
+                  width: 100%;
                 }
               }
             }
@@ -1094,7 +1162,9 @@ main {
               a {
                 &.color_picker,
                 &.moveup_spell,
-                &.movedown_spell {
+                &.movedown_spell,
+                &.note_spell,
+                &.favorite_spell {
                   display: none;
                 }
                 &.remove_spell {

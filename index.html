@@ -14,6 +14,7 @@
     <link type="text/css" rel="stylesheet" href="compiled/css/style.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="localforage.min.js"></script>
   </head>
 
   <body>
@@ -23,13 +24,13 @@
         <div class="inner_box">
           <a href="#" id="header_left_button"> <i class="ri-menu-2-line"></i> </a>
           <div class="header_left">
-            <button><i class="ri-save-3-line"></i> Download</button>
-            <button id="clear"><i class="ri-delete-bin-line"></i> Clear all</button>
+            <button id="download_button" class="disabled"><i class="ri-save-3-line"></i> Download</button>
+            <button id="clear" class="disabled"><i class="ri-delete-bin-line"></i> Clear all</button>
             <label for="input-file">
               <i class="ri-folder-open-line"></i> Import
               <input type="file" id="input-file" style="display: none" accept=".json" />
             </label>
-            <button id="export_pdf"> <i class="ri-file-list-2-line"></i> Export PDF</button>
+            <button id="export_pdf" class="disabled"> <i class="ri-file-list-2-line"></i> Export PDF</button>
             <!-- <p>Disable filters to enable all features again</p> -->
           </div>
           <div class="header_right">
@@ -57,7 +58,7 @@
       </div>
       <div class="outer_box" id="title">
         <div class="inner_box">
-          <h1 id="page_title"><i class="ri-quill-pen-line"></i> Inky's Tentacletastic Spellbook</h1><h5 style="text-align: center; font-weight: 500;">0.0.3 "favorite beta"</h5>
+          <h1 id="page_title"><i class="ri-quill-pen-line"></i> Inky's Tentacletastic Spellbook</h1><h5 style="text-align: center; font-weight: 500;">0.0.3 "Swift Quiver"</h5>
         </div>
       </div>
       <div class="outer_box" id="search">

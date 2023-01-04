@@ -8,8 +8,10 @@ Enjoy using this or just appreciate what I do? [Buy me a coffee](https://paypal.
 ## Features
 - Save your spells in a grid sorted by spell level
 - Manually change the spells order within levels
+- Favorite spells
+- Add notes to spells
 - Export to printable PDF
-- Spellbook persists across browser-sessions by being saved in local storage
+- Spellbook persists across browser-sessions by saving in local storage
 - Filter through your spellbook using different filters and text-based search
 - Export/import your spellbook to/from file to transfer it between devices or work on multiple spellbooks. 
 - Spells mentioned in descriptions are clickable for a look-up
@@ -20,15 +22,13 @@ Enjoy using this or just appreciate what I do? [Buy me a coffee](https://paypal.
 - Optimize JS code for better performance
 - Adding missing spells to database
 - Converting formatting symbols in descriptions to proper HTML
-- Ability to add spells to favorites displayed at the top
 - Making longer descriptions prettier with fold-out/
-- Ability to add notes to spells
 - Add optional spellslot/sorcery points management functionality
 - Adding complete documentation in JS code
 - Display options (on/off) for extended properties like materials and components
 - Add more color themes
 - Order spells using drag and drop 
-- Create apps for Android and iOS
+- Create apps for Android and iOS (with release version)
 
 ## Bugs
 - many (probably)
@@ -39,11 +39,20 @@ You can help me by reporting bugs
 - Vorpalhex for the [spells database](https://github.com/vorpalhex/srd_spells) 
 
 ## Changelog
-*V0.0.1*
+*V0.0.1 "much beta"*
 - Initial publish/beta version
 
-*V0.0.2*
-- Added level separators in PDF export
+*V0.0.2 "favorite beta"*
+- Added level indicators in PDF export
+
+*V0.0.3 "Swift Quiver"*
+- Bug fixes
+- Favorites functionality added
+- Notes functionality added
+- Improved spell search and load speed dramatically by loading the spells database into client memory instead of making calls to the server every action
+- PDF export fixed (now works across screen sizes/devices)
+- Bigger spell-control buttons on touch devices
+- Compacter layout on small screens
 
 ## Licensing 
 Open Game License v1.0a Copyright 2000, Wizards of the Coast, Inc.

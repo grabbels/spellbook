@@ -21,6 +21,9 @@ let prefsPanel = document.getElementById("visual_prefs_panel");
 let themeSelect = document.getElementById("theme_select");
 let headerLeft = document.querySelector("#header .header_left");
 let headerLeftButton = document.getElementById("header_left_button");
+let exportPdfButton = document.getElementById("export_pdf");
+let clearAllButton = document.getElementById("clear");
+let downloadButton = document.getElementById("download_button");
 let tempSpellContainer = document.getElementById("temp_spell");
 let filters = document.querySelectorAll("#filters .filter a");
 let filtersButton = document.getElementById("filters_button");
@@ -40,9 +43,12 @@ let actualBookmarks = bookmarksBar.querySelectorAll(".actual_bookmarks .bookmark
 let favoriteSpells = document.querySelector("ul.favorites");
 const activeSpellsArray = [];
 const favoriteSpellsArray = [];
+const notesArray = [];
+const list = "";
 let fromstorage = false;
+// const masterList = ''
 
-// console.log(localStorage.favoriteSpells)
+// const db = Dexie.import("spells.json");
 
 /////////bind relevant buttons and links/////////////
 
@@ -96,49 +102,63 @@ themeSelect.addEventListener("change", () => {
 //////////////////////////////////////////////////////////////////////////
 
 ///////////////////////CHECK FOR LOCAL STORAGE SPELLSHEET//////////////////
-const delay = async (ms = 10) => new Promise((resolve) => setTimeout(resolve, ms));
+// const delay = async (ms = 10) => new Promise((resolve) => setTimeout(resolve, ms));
 if (localStorage.activeSpells) {
   var type = "direct";
   var array = "";
   populateSpellsFromStorage(array, type);
 }
 
-async function populateSpellsFromStorage(array, el) {
+// async function populateSpellsFromStorage(array, el) {
+function populateSpellsFromStorage(array, el) {
   spellsLoading.style.display = "block";
-
   var type = el;
-  if (!array) {
-    var activeSpellsArray = localStorage.activeSpells.split(",");
-  } else {
-    var activeSpellsArray = array.split(",");
-  }
+  var activeSpellsArray = localStorage.activeSpells.split(",");
   for (var i = 0, len = activeSpellsArray.length; i < len; i++) {
     var query = activeSpellsArray[i];
     fetchSpells(query, type, activeSpellsArray.length);
-    await delay(50);
+    // await delay(50);
   }
 }
 
 function populateFavorites() {
-  var favoriteSpellsArray = localStorage.favoriteSpells.split(",");
-  for (let i = 0; i < favoriteSpellsArray.length; i++) {
-    var favedSpell = document.querySelector('.spell[data-name="' + favoriteSpellsArray[i] + '"');
-    addRemoveFavorite(favedSpell);
-    bindRemoveMoveSpell(favedSpell);
-    console.log(i);
-    console.log(favoriteSpellsArray.length);
-    if (i === favoriteSpellsArray.length - 1) {
-      spellsLoading.style.display = "none";
+  // favoriteSpellsArray = [];
+  if (localStorage.favoriteSpells) {
+    const favoriteSpellsArray = new Promise((resolve) => {
+      var favoriteSpellsArray = localStorage.favoriteSpells.split(",");
+      resolve(favoriteSpellsArray);
+    });
+    favoriteSpellsArray.then((favoriteSpellsArray) => {
+      for (let i = 0; i < favoriteSpellsArray.length; i++) {
+        var favedSpell = document.querySelector('.spell[data-name="' + favoriteSpellsArray[i] + '"');
+        addRemoveFavorite(favedSpell);
+        bindRemoveMoveSpell(favedSpell);
+        if (i === favoriteSpellsArray.length - 1) {
+          spellsLoading.style.display = "none";
+        }
+      }
+    });
+  }
+}
+
+function populateNotes() {
+  if (localStorage.notes) {
+    var notesArray = JSON.parse(localStorage.notes);
+    for (let i = 0; i < notesArray.length; i++) {
+      var notesContainer = document.querySelector(".spell[data-name='" + notesArray[i][0] + "']:not(.favorite) .notes p.notes_inner");
+      notesContainer.innerHTML = notesArray[i][1];
+      notesContainer.parentElement.style.display = "block";
     }
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////
 
-document.querySelector("#clear").addEventListener("click", () => {
+clearAllButton.addEventListener("click", () => {
   let text = "Are you sure you want to remove all your saved spells?";
   if (confirm(text) == true) {
     localStorage.setItem("activeSpells", "");
+    localStorage.setItem("favoriteSpells", "");
     location.reload();
   }
 });
@@ -173,44 +193,61 @@ function bindCloseResultsContainer(e) {
 }
 
 function fetchSpells(query, type, length) {
-  fetch("../spells.json")
-    .then((res) => res.json())
-    .then((data) => {
-      let results = [];
-      let resultsIndex = [];
-      for (var i = 0, len = data.length; i < len; i++) {
-        if (data[i].name.toLowerCase().includes(query.toLowerCase())) {
-          results.push(data[i]);
-        }
-      }
-      if (type === "temp") {
-        addToSheet(results[0], type, length);
-      } else if (type === "direct" || type === "import") {
-        addToSheet(results[0], type, length);
-      } else {
-        if (results.length > 0) {
-          results.forEach((e, index) => {
-            createResult(e, resultsIndex);
+  const list = new Promise((resolve) => {
+    if (!list) {
+      if (!localStorage.master) {
+        fetch("../spells.json")
+          .then((res) => res.json())
+          .then((data) => {
+            const masterSpellsList = JSON.stringify(data);
+            localStorage.setItem("master", masterSpellsList);
+            var list = data;
+            resolve(list);
           });
-          loadingAnimation.classList.remove("active");
-          resultsContainer.classList.add("open");
-          bindCloseResultsContainer();
-        } else {
-          resultsContainer.innerHTML = "<li><p>No results</p></li>";
-          loadingAnimation.classList.remove("active");
-          resultsContainer.classList.add("open");
-          bindCloseResultsContainer();
-        }
+      } else {
+        var list = JSON.parse(localStorage.master);
+        resolve(list);
       }
-    });
+    } else {
+      resolve(list);
+    }
+  });
+  list.then((list) => {
+    let results = [];
+    let resultsIndex = [];
+    for (var i = 0, len = list.length; i < len; i++) {
+      if (list[i].name.toLowerCase().includes(query.toLowerCase())) {
+        results.push(list[i]);
+      }
+    }
+    if (type === "temp") {
+      addToSheet(results[0], type, length);
+    } else if (type === "direct" || type === "import") {
+      addToSheet(results[0], type, length);
+    } else {
+      if (results.length > 0) {
+        results.forEach((e, index) => {
+          createResult(e, resultsIndex);
+        });
+        loadingAnimation.classList.remove("active");
+        resultsContainer.classList.add("open");
+        bindCloseResultsContainer();
+      } else {
+        resultsContainer.innerHTML = "<li><p>No results</p></li>";
+        loadingAnimation.classList.remove("active");
+        resultsContainer.classList.add("open");
+        bindCloseResultsContainer();
+      }
+    }
+  });
 }
-var iteration = 0;
-async function addToSheet(e, type, length) {
+window.iterationCount = 0;
+function addToSheet(e, type, length) {
   if (length) {
-    iteration++;
+    window.iterationCount++;
   }
   const spell = document.createElement("li");
-  if (type !== "import" && activeSpellsArray.includes(e.name)) {
+  if (type !== "temp" && type !== "import" && activeSpellsArray.includes(e.name)) {
     alert("This spell is already in your spellbook!");
     return;
   }
@@ -272,7 +309,7 @@ async function addToSheet(e, type, length) {
   spell.setAttribute("data-name", e.name);
   spell.setAttribute("data-range", e.range);
   spell.setAttribute("data-duration", e.duration);
-  spell.setAttribute("data-save", savingThrow);
+  spell.setAttribute("data-save", savingThrow.toLowerCase());
   if (e.level === "cantrip") {
     spell.setAttribute("data-level", e.level);
   } else {
@@ -307,19 +344,25 @@ async function addToSheet(e, type, length) {
       var icon = "";
   }
 
+  // if (e.duration.toLowerCase().includes('up to')) {
+  //   var duration = e.duration.replace("up to", '<i class="ri-timer-fill"></i>');
+  //   var duration = e.duration.replace("Up to", '<i class="ri-timer-fill"></i>');
+  // } else {
+  //   var duration = e.duration
+  // }
+
   var description = e.description.replace("/n/n", "</p><p>");
   var descriptionSpellLinks = description.match(/\[(.*?)\]/g);
   if (descriptionSpellLinks) {
-    descriptionSpellLinks.forEach((e) => {
-      var spellTitle = e.replace("[", "").replace("]", "");
+    for (let i = 0; i < descriptionSpellLinks.length; i++) {
+      var spellTitle = descriptionSpellLinks[i].replace("[", "").replace("]", "");
       var spellLink = '<a href="#" class="spell_link">' + spellTitle + "</a>";
-      description = description.replace(e, spellLink);
-    });
+      description = description.replace(descriptionSpellLinks[i], spellLink);
+    }
   }
-  // console.log(description)
-
+  //
   spell.innerHTML =
-    '<div class="spell_inner"><div class="controls"><a href="#" class="favorite_spell"><span>Add to favorites</span><i class="ri-star-s-line"></i></a><a href="#" class="moveup_spell"><span>Move spell up</span><i class="ri-arrow-up-s-line"></i></a><a href="#" class="movedown_spell"><span>Move spell down</span><i class="ri-arrow-down-s-line"></i></a><a href="#" class="remove_spell"><span>Remove spell</span><i class="ri-close-line"></i></a></div><h3><i class="' +
+    '<div class="spell_inner"><div class="controls"><a href="#" class="note_spell"><span>Edit notes</span><i class="ri-draft-line"></i> </i></a><a href="#" class="favorite_spell"><span>Add to favorites</span><i class="ri-star-s-line"></i></a><a href="#" class="moveup_spell"><span>Move spell up</span><i class="ri-arrow-up-s-line"></i></a><a href="#" class="movedown_spell"><span>Move spell down</span><i class="ri-arrow-down-s-line"></i></a><a href="#" class="remove_spell"><span>Remove spell</span><i class="ri-close-line"></i></a></div><h3><i class="' +
     icon +
     '" title="' +
     e.school +
@@ -347,14 +390,14 @@ async function addToSheet(e, type, length) {
     description +
     "</p></div>" +
     higherLevel +
-    "</div>";
-  // console.log(e)
+    "<div class='notes' style='display: none;'><p><strong>Notes</strong></p><p class='notes_inner'></p></div></div>";
+  //
   if (e.level === "cantrip") {
     var spellLevel = 0;
   } else {
     var spellLevel = e.level;
   }
-  // console.log(spellLists);
+  //
   if (type === "temp") {
     tempSpellContainer.appendChild(spell);
     tempSpellContainer.parentElement.style.display = "block";
@@ -378,17 +421,10 @@ async function addToSheet(e, type, length) {
       activeSpellsArray.push(e.name);
     }
     spellLists[spellLevel].appendChild(spell);
-    // document.addEventListener("touchstart", function () {
-    //   spell.addEventListener('click', ()=>{
-
-    //     if (event.target instanceof HTMLAnchorElement) {
-    //       console.log('link')
-    //     } else {
-    //       // spell.classList.toggle("hover");
-    //     }
-    //   })
-    // });
     noSpells.style.display = "none";
+    downloadButton.classList.remove("disabled");
+    exportPdfButton.classList.remove("disabled");
+    clearAllButton.classList.remove("disabled");
     bindRemoveMoveSpell(spell);
     if (descriptionSpellLinks) {
       var descriptionLinks = spell.querySelectorAll("a.spell_link");
@@ -403,19 +439,28 @@ async function addToSheet(e, type, length) {
       }
     }
     if (length) {
-      if (iteration >= length) {
+      if (window.iterationCount === length) {
+        window.iterationCount = 0;
         hideShowLevels();
         checkUpDownSetOrder();
         if (localStorage.favoriteSpells) {
-          populateFavorites();
+          setTimeout(() => {
+            populateFavorites();
+            populateNotes();
+            length = "";
+          }, 0);
         } else {
+          setTimeout(() => {
+            populateNotes();
+            length = "";
+          }, 0);
+          hideShowLevels();
+          checkUpDownSetOrder();
           saveSpellSheet();
           spellsLoading.style.display = "none";
+          var length = "";
         }
-
         var length = "";
-        // populateFavorites();
-        // spellsLoading.style.display = "none";
       }
     } else {
       hideShowLevels();
@@ -424,22 +469,21 @@ async function addToSheet(e, type, length) {
     }
   }
 }
-
 function addRemoveFavorite(e) {
   if (e.classList.contains("favorite") || e.classList.contains("in_favorites")) {
     if (e.classList.contains("favorite")) {
-      event.target.lastChild.classList.remove("ri-star-s-fill");
-      event.target.lastChild.classList.add("ri-star-s-line");
-      event.target.firstChild.innerHTML = "Add to favorites";
+      e.querySelector(".favorite_spell").lastChild.classList.remove("ri-star-s-fill");
+      e.querySelector(".favorite_spell").lastChild.classList.add("ri-star-s-line");
+      e.querySelector(".favorite_spell").firstChild.innerHTML = "Add to favorites";
       let unfavSpellName = e.getAttribute("data-name");
       e.remove();
       document.querySelector('.spell[data-name="' + unfavSpellName + '"] .favorite_spell i').classList.remove("ri-star-s-fill");
       document.querySelector('.spell[data-name="' + unfavSpellName + '"] .favorite_spell i').classList.add("ri-star-s-line");
       document.querySelector('.spell[data-name="' + unfavSpellName + '"]').classList.remove("in_favorites");
     } else if (e.classList.contains("in_favorites")) {
-      event.target.lastChild.classList.remove("ri-star-s-fill");
-      event.target.lastChild.classList.add("ri-star-s-line");
-      event.target.firstChild.innerHTML = "Add to favorites";
+      e.querySelector(".favorite_spell").lastChild.classList.remove("ri-star-s-fill");
+      e.querySelector(".favorite_spell").lastChild.classList.add("ri-star-s-line");
+      e.querySelector(".favorite_spell").firstChild.innerHTML = "Add to favorites";
       let unfavSpellName = e.getAttribute("data-name");
       document.querySelector('.spell.favorite[data-name="' + unfavSpellName + '"] .favorite_spell i').classList.remove("ri-star-s-fill");
       document.querySelector('.spell.favorite[data-name="' + unfavSpellName + '"] .favorite_spell i').classList.add("ri-star-s-line");
@@ -464,6 +508,18 @@ function addRemoveFavorite(e) {
     }
     fav.classList.add("favorite");
     fav.querySelector("h3").innerHTML = cloneName + " <span>" + cloneLevel + "</span>";
+    var spellLink = document.createElement("a");
+    spellLink.href = "#";
+    spellLink.classList.add("spell_link", "cover");
+    spellLink.addEventListener("click", () => {
+      event.preventDefault();
+      document.documentElement.setAttribute("data-scroll", window.scrollY);
+      var query = fav.getAttribute("data-name");
+
+      var type = "temp";
+      fetchSpells(query, type);
+    });
+    fav.appendChild(spellLink);
     favoriteSpells.appendChild(fav);
     bindRemoveMoveSpell(fav);
     e.classList.add("in_favorites");
@@ -479,6 +535,36 @@ function bindRemoveMoveSpell(e) {
     event.preventDefault();
     addRemoveFavorite(e);
   });
+  //bind notes button for (non-cloned) spells
+  if (!e.classList.contains("in_favorites")) {
+    e.querySelector(".note_spell").addEventListener("click", () => {
+      event.preventDefault();
+      e.querySelector(".notes").style.display = "block";
+      var oldNotes = e.querySelector(".notes p.notes_inner").innerHTML;
+      e.querySelector(".notes p.notes_inner").innerHTML = "";
+      var textBox = document.createElement("textarea");
+      e.querySelector(".notes").appendChild(textBox);
+      var textBoxButton = document.createElement("button");
+      e.querySelector(".notes").appendChild(textBoxButton);
+      textBoxButton.innerHTML = "Save";
+      textBox.value = oldNotes;
+      textBoxButton.addEventListener("click", () => {
+        var newNotes = textBox.value;
+        textBox.remove();
+        textBoxButton.remove();
+        e.querySelector(".notes p.notes_inner").innerHTML = newNotes;
+        if (newNotes) {
+          e.querySelector(".notes").style.display = "block";
+          notesArray.push([e.getAttribute("data-name"), newNotes]);
+          saveSpellSheet();
+        } else {
+          e.querySelector(".notes").style.display = "none";
+          saveSpellSheet();
+        }
+      });
+    });
+  }
+
   //bind remove spell button and function
   e.querySelector(".remove_spell").addEventListener("click", () => {
     event.preventDefault();
@@ -492,6 +578,9 @@ function bindRemoveMoveSpell(e) {
     saveSpellSheet();
     if (activeSpellsArray.length < 1) {
       noSpells.style.display = "block";
+      downloadButton.classList.add("disabled");
+      exportPdfButton.classList.add("disabled");
+      clearAllButton.classList.add("disabled");
     }
     checkUpDownSetOrder();
     hideShowLevels();
@@ -561,7 +650,7 @@ function hideShowLevels() {
       }
     }
   }
-  if (favoriteSpells.childElementCount < 1) {
+  if (favoriteSpells.childElementCount < 1 || favoriteSpells.querySelectorAll('.shown').length < 1) {
     favoriteSpells.style.display = "none";
     favoriteSpells.previousElementSibling.style.display = "none";
     bookmarksBar.querySelector("[data-level='favorites']").style.display = "none";
@@ -600,31 +689,34 @@ searchBox.addEventListener("input", (e) => {
     resultsContainer.innerHTML = "";
   }
 });
-searchBox.addEventListener(
-  "input",
-  debounce(() => {
-    var query = searchBox.value;
-    if (query) {
-      fetchSpells(query);
-    } else {
-      loadingAnimation.classList.remove("active");
-    }
-  }, 600)
-);
+searchBox.addEventListener("input", () => {
+  var query = searchBox.value;
+  if (query) {
+    fetchSpells(query);
+  } else {
+    loadingAnimation.classList.remove("active");
+  }
+});
 
-document.querySelector("button").addEventListener("click", () => {
+downloadButton.addEventListener("click", () => {
   downloadFile();
 });
 
 function downloadFile() {
   saveSpellSheet();
-  const activeSpellsSave = localStorage.activeSpells;
+  var activeSpellsSave = localStorage.activeSpells.split(",");
+  // activeSpellsSave.splice(0, 0, "spells");
+  var activeSpellsSave = activeSpellsSave.toString();
+  var favoriteSpellsSave = localStorage.favoriteSpells.split(",");
+  favoriteSpellsSave.splice(0, 0, "favorites");
+  var favoriteSpellsSave = favoriteSpellsSave.toString();
+  var saveFileString = activeSpellsSave + "," + favoriteSpellsSave;
   let a = document.createElement("a");
   var name = prompt("Filename:");
   if (name !== null) {
     if (typeof a.download !== "undefined") a.download = name + ".json";
     a.href = URL.createObjectURL(
-      new Blob([activeSpellsSave], {
+      new Blob([saveFileString], {
         type: "application/octet-stream",
       })
     );
@@ -640,24 +732,30 @@ function getFile(event) {
   let text = "Importing a spellbook will overwrite your current spells. Do you want to continue?";
   if (confirm(text) == true) {
     spellsLoading.style.display = "block";
+    localStorage.setItem("activeSpells", "");
+    localStorage.setItem("favoriteSpells", "");
     const input = event.target;
     if ("files" in input && input.files.length > 0) {
-      spellLists.forEach((e) => {
-        e.innerHTML = "";
-      });
-      const activeSpellsArray = [];
-      placeFileContent(activeSpellsArray, input.files[0]);
+      favoriteSpells.innerHTML = "";
+      for (let i = 0; i < spellLists.length; i++) {
+        spellLists[i].innerHTML = "";
+      }
+      placeFileContent(input.files[0]);
     }
   }
 }
 
-function placeFileContent(target, file) {
+function placeFileContent(file) {
   readFileContent(file)
     .then((content) => {
-      const activeSpellsArray = content.toString();
-      saveSpellSheet();
+      const splitContentArray = content.split(",favorites,");
+      const activeSpellsArray = splitContentArray[0];
+      const favoriteSpellsArray = splitContentArray[1];
+      localStorage.setItem("activeSpells", activeSpellsArray);
+      localStorage.setItem("favoriteSpells", favoriteSpellsArray);
+      // saveSpellSheet();
       var type = "import";
-      populateSpellsFromStorage(activeSpellsArray, type);
+      populateSpellsFromStorage(array, type);
     })
     .catch((error) => alert(error));
 }
@@ -853,6 +951,13 @@ function saveSpellSheet() {
       favoriteSpellsArray.push(favSpells[i].getAttribute("data-name"));
     }
   }
+  var notesArray = [];
+  for (let i = 0; i < spells.length; i++) {
+    var note = spells[i].querySelector(".notes p.notes_inner").innerHTML;
+    if (note) {
+      notesArray.push([spells[i].getAttribute("data-name"), note]);
+    }
+  }
   if (activeSpellsArray.length) {
     localStorage.setItem("activeSpells", activeSpellsArray.toString());
   } else {
@@ -863,12 +968,17 @@ function saveSpellSheet() {
   } else {
     localStorage.setItem("favoriteSpells", "");
   }
+  if (notesArray.length) {
+    localStorage.setItem("notes", JSON.stringify(notesArray));
+  } else {
+    localStorage.setItem("notes", "");
+  }
 }
 
 /////////////////////////////////////////////////////////////////
 
 ///////////////////////PDF FUNCTIONALITY//////////////////////////
-document.getElementById("export_pdf").addEventListener("click", () => {
+exportPdfButton.addEventListener("click", () => {
   exportAsPDF();
 });
 
@@ -876,48 +986,70 @@ function exportAsPDF() {
   var blocker = document.createElement("div");
   blocker.className = "blocker";
   blocker.innerHTML = '<i class="ri-loader-4-line"></i>';
+  window.blocker = blocker;
   document.documentElement.style.fontSize = "10px";
   document.body.appendChild(blocker);
-  var pageNumber = 0;
-  var iterationCount = 0;
+  window.pageNumber = 0;
+  window.iterationCount = 0;
   var printLayoutWindow = document.createElement("div");
   printLayoutWindow.id = "print_layout_window";
+  window.printLayoutWindow = printLayoutWindow;
   window.printLayoutInner = document.createElement("div");
   window.printLayoutInner.classList.add("layout_inner");
   printLayoutWindow.appendChild(window.printLayoutInner);
   document.body.appendChild(printLayoutWindow);
   window.printLayoutInner = document.querySelectorAll("#print_layout_window .layout_inner");
   window.currentSpells = document.querySelectorAll(".spell.favorite");
-  window.currentType = 'favorite';
+  if (window.currentSpells) {
+    window.currentType = "favorite";
+  } else {
+    window.currentType = "normal";
+  }
   renderSpells();
   function renderSpells() {
+    //
     for (let i = 0; i < window.currentSpells.length; i++) {
       let clone = window.currentSpells[i].cloneNode(true);
-      if (iterationCount === 8) {
+      //
+      if (window.iterationCount === 8) {
         var newPageLayout = document.createElement("div");
         newPageLayout.classList.add("layout_inner");
-        printLayoutWindow.appendChild(newPageLayout);
+        window.printLayoutWindow.appendChild(newPageLayout);
         window.printLayoutInner = document.querySelectorAll("#print_layout_window .layout_inner");
         pageNumber++;
-        iterationCount = 0;
+        window.iterationCount = 0;
       }
-      iterationCount++;
-      window.printLayoutInner[pageNumber].appendChild(clone);
+      window.iterationCount++;
+      printLayoutInner[pageNumber].appendChild(clone);
+      if (i === window.currentSpells.length - 1 && window.currentType === "favorite") {
+        // clone.style.gridColumnStart = '0'
+        // clone.style.gridColumnEnd = '2'
+        clone.classList.add("last-favorite");
+        // clone.style.border = '3px solid black';
+      }
       var cloneName = clone.querySelector("h3").innerHTML;
       var cloneLevel = "Level " + clone.getAttribute("data-level");
       if (cloneLevel === "Level cantrip") {
         var cloneLevel = "Cantrip";
       }
-      clone.querySelector("h3").innerHTML = cloneName + " <span>" + cloneLevel + "</span>";
+      if (window.currentType === "favorite") {
+        var innerHTML = cloneName + " <i class='ri-star-fill'></i>";
+      } else {
+        var innerHTML = cloneName + " <span>" + cloneLevel + "</span>";
+      }
+      clone.querySelector("h3").innerHTML = innerHTML;
       if (i === window.currentSpells.length - 1 && window.currentType === "normal") {
-        console.log('all done')
+        window.currentSpells = "";
+        //
         setTimeout(() => {
           html2pdffunction();
         }, 100);
-      } else if (i === window.currentSpells.length - 1) {
-        console.log('favorites done')
+      } else if (i === window.currentSpells.length - 1 && window.currentType === "favorite") {
+        //
         window.currentType = "normal";
+        // window.iterationCount = 8;
         window.currentSpells = document.querySelectorAll(".spell:not(.favorite)");
+        //
         renderSpells();
       }
     }
@@ -925,13 +1057,13 @@ function exportAsPDF() {
 }
 
 function html2pdffunction() {
-  // resizeAllGridItems();
-  console.log('test')
+  //
+  resizeAllGridItems();
   var opt = {
     margin: 0,
     filename: "spellbook.pdf",
     image: { type: "jpeg", quality: 98 },
-    html2canvas: { scale: 2.5, y: 30, x: 449 },
+    html2canvas: { scale: 2.5, y: 30, x: 449, windowWidth: 1700, windowHeight: 950 },
     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
     pagebreak: { mode: "legacy" },
   };
@@ -940,9 +1072,9 @@ function html2pdffunction() {
     .from(window.printLayoutWindow)
     .save()
     .then(() => {
-      console.log("done");
+      //
       window.printLayoutWindow.remove();
-      blocker.remove();
+      window.blocker.remove();
       document.documentElement.style.fontSize = "16px";
     });
 }
@@ -953,6 +1085,10 @@ function resizeGridItem(item) {
   let rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue("grid-row-gap"));
   let rowSpan = Math.ceil((item.querySelector(".spell_inner").getBoundingClientRect().height + rowGap) / (rowHeight + rowGap));
   item.style.gridRowEnd = "span " + rowSpan;
+  if (item.classList.contains("last-favorite")) {
+    // item.style.gridColumnStart = "1";
+    // item.style.gridColumnEnd = "3";
+  }
 }
 
 function resizeAllGridItems() {
