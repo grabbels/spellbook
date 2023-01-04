@@ -368,17 +368,17 @@ function addToSheet(e, type, length) {
     e.school +
     '"></i>' +
     e.name +
-    '</h3><ul class="terms large"><li class="casting-time"><p><i title="casting time" class="ri-flashlight-line"></i>' +
+    '</h3><ul class="terms large"><li class="casting-time" title="Casting time"><p><i title="casting time" class="ri-flashlight-line"></i>' +
     castingTime +
-    '</p></li><li class="range"><p><i title="range" class="ri-arrow-right-up-line"></i>' +
+    '</p></li><li class="range" title="Range or target"><p><i title="range" class="ri-arrow-right-up-line"></i>' +
     e.range +
-    '</p></li><li class="duration"><p><i title="duration" class="ri-time-line"></i>' +
+    '</p></li><li class="duration" title="Duration"><p><i title="duration" class="ri-time-line"></i>' +
     e.duration +
-    '</p></li></ul><ul class="terms small"><li class="school"><p><i title="school" class="ri-book-2-line"></i>' +
+    '</p></li></ul><ul class="terms small"><li class="school" title="School of magic"><p><i title="school" class="ri-book-2-line"></i>' +
     e.school +
-    '</p></li><li class="save"><p><i title="save" class="ri-lifebuoy-line"></i>' +
+    '</p></li><li class="save" title="Saving throw"><p><i title="save" class="ri-lifebuoy-line"></i>' +
     savingThrow +
-    '</p></li><li class="spell-attack"><p><i title="spell attack" class="ri-sword-line"></i>' +
+    '</p></li><li class="spell-attack" title="Spell attack"><p><i title="spell attack" class="ri-sword-line"></i>' +
     spellAttack +
     '</p></li><li class="components hidden"><p><i title="components" class="ri-voiceprint-line"></i>' +
     componentsString +
