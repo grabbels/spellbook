@@ -368,23 +368,23 @@ function addToSheet(e, type, length) {
     e.school +
     '"></i>' +
     e.name +
-    '</h3><ul class="terms large"><li class="casting-time" title="Casting time"><p><i title="casting time" class="ri-flashlight-line"></i>' +
+    '</h3><ul class="terms large"><li class="casting-time" title="Casting time"><div class="popup"><p>Casting time</p></div><p><i title="casting time" class="ri-flashlight-line"></i>' +
     castingTime +
-    '</p></li><li class="range" title="Range or target"><p><i title="range" class="ri-arrow-right-up-line"></i>' +
+    '</p></li><li class="range" title="Range or target"><div class="popup"><p>Spell range</p></div><p><i title="range" class="ri-arrow-right-up-line"></i>' +
     e.range +
-    '</p></li><li class="duration" title="Duration"><p><i title="duration" class="ri-time-line"></i>' +
+    '</p></li><li class="duration" title="Duration"><div class="popup"><p>Spell duration</p></div><p><i title="duration" class="ri-time-line"></i>' +
     e.duration +
-    '</p></li></ul><ul class="terms small"><li class="school" title="School of magic"><p><i title="school" class="ri-book-2-line"></i>' +
+    '</p></li></ul><ul class="terms small"><li class="school" title="School of magic"><div class="popup"><p>School of magic</p></div><p><i title="school" class="ri-book-2-line"></i>' +
     e.school +
-    '</p></li><li class="save" title="Saving throw"><p><i title="save" class="ri-lifebuoy-line"></i>' +
+    '</p></li><li class="save" title="Saving throw"><div class="popup"><p>Saving throw</p></div><p><i title="save" class="ri-lifebuoy-line"></i>' +
     savingThrow +
-    '</p></li><li class="spell-attack" title="Spell attack"><p><i title="spell attack" class="ri-sword-line"></i>' +
+    '</p></li><li class="spell-attack" title="Spell attack"><div class="popup"><p>(Spell) attack roll</p></div><p><i title="spell attack" class="ri-sword-line"></i>' +
     spellAttack +
-    '</p></li><li class="components hidden"><p><i title="components" class="ri-voiceprint-line"></i>' +
+    '</p></li><li class="components hidden"><div class="popup"><p>Components</p></div><p><i title="components" class="ri-voiceprint-line"></i>' +
     componentsString +
     "</p></li>" +
     materialsNeeded +
-    '<li class="ritual"><p><i title="ritual" class="ri-open-arm-line"></i>' +
+    '<li class="ritual"><div class="popup"><p>Ritual</p></div><p><i title="ritual" class="ri-open-arm-line"></i>' +
     ritual +
     "</p></li></ul><div class='description_wrapper'><p>" +
     description +
@@ -539,29 +539,31 @@ function bindRemoveMoveSpell(e) {
   if (!e.classList.contains("in_favorites")) {
     e.querySelector(".note_spell").addEventListener("click", () => {
       event.preventDefault();
-      e.querySelector(".notes").style.display = "block";
-      var oldNotes = e.querySelector(".notes p.notes_inner").innerHTML;
-      e.querySelector(".notes p.notes_inner").innerHTML = "";
-      var textBox = document.createElement("textarea");
-      e.querySelector(".notes").appendChild(textBox);
-      var textBoxButton = document.createElement("button");
-      e.querySelector(".notes").appendChild(textBoxButton);
-      textBoxButton.innerHTML = "Save";
-      textBox.value = oldNotes;
-      textBoxButton.addEventListener("click", () => {
-        var newNotes = textBox.value;
-        textBox.remove();
-        textBoxButton.remove();
-        e.querySelector(".notes p.notes_inner").innerHTML = newNotes;
-        if (newNotes) {
-          e.querySelector(".notes").style.display = "block";
-          notesArray.push([e.getAttribute("data-name"), newNotes]);
-          saveSpellSheet();
-        } else {
-          e.querySelector(".notes").style.display = "none";
-          saveSpellSheet();
-        }
-      });
+      if (!e.querySelector("textarea")) {
+        e.querySelector(".notes").style.display = "block";
+        var oldNotes = e.querySelector(".notes p.notes_inner").innerHTML;
+        e.querySelector(".notes p.notes_inner").innerHTML = "";
+        var textBox = document.createElement("textarea");
+        e.querySelector(".notes").appendChild(textBox);
+        var textBoxButton = document.createElement("button");
+        e.querySelector(".notes").appendChild(textBoxButton);
+        textBoxButton.innerHTML = "Save";
+        textBox.value = oldNotes;
+        textBoxButton.addEventListener("click", () => {
+          var newNotes = textBox.value;
+          textBox.remove();
+          textBoxButton.remove();
+          e.querySelector(".notes p.notes_inner").innerHTML = newNotes;
+          if (newNotes) {
+            e.querySelector(".notes").style.display = "block";
+            notesArray.push([e.getAttribute("data-name"), newNotes]);
+            saveSpellSheet();
+          } else {
+            e.querySelector(".notes").style.display = "none";
+            saveSpellSheet();
+          }
+        });
+      }
     });
   }
 
@@ -650,7 +652,7 @@ function hideShowLevels() {
       }
     }
   }
-  if (favoriteSpells.childElementCount < 1 || favoriteSpells.querySelectorAll('.shown').length < 1) {
+  if (favoriteSpells.childElementCount < 1 || favoriteSpells.querySelectorAll(".shown").length < 1) {
     favoriteSpells.style.display = "none";
     favoriteSpells.previousElementSibling.style.display = "none";
     bookmarksBar.querySelector("[data-level='favorites']").style.display = "none";
