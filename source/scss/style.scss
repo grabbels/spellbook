@@ -66,12 +66,96 @@ html {
       }
     }
   }
-  &.soft {
+  &.pastry {
     --black: #3c2c2c;
     --white: #ffd8d6;
     --accent: #86497a;
     --alt: #643542;
 
+    .spell {
+      .spell_inner {
+        ul.terms.large {
+          li {
+            background-color: var(--alt);
+            border-color: var(--alt);
+          }
+        }
+      }
+    }
+  }
+  &.skyrider {
+    --black: #4f3820;
+    --white: #fff;
+    --accent: #e1700c;
+    --alt: #0082aa;
+
+    .spell {
+      .spell_inner {
+        ul.terms.large {
+          li {
+            background-color: var(--alt);
+            border-color: var(--alt);
+          }
+        }
+      }
+    }
+  }
+  &.firedragon {
+    --black: #fff;
+    --white: #4a3419;
+    --accent: #b47430;
+    --alt: #fb5848;
+    --veil: rgba(0, 0, 0, 0.9);
+    .spell {
+      .spell_inner {
+        ul.terms.large {
+          li {
+            background-color: var(--alt);
+            border-color: var(--alt);
+          }
+        }
+      }
+    }
+  }
+  &.oceandragon {
+    --black: #dfcdc2;
+    --white: #200822;
+    --accent: #20d781;
+    --alt: #429fae;
+    --veil: rgba(0, 0, 0, 0.9);
+    .spell {
+      .spell_inner {
+        ul.terms.large {
+          li {
+            background-color: var(--alt);
+            border-color: var(--alt);
+          }
+        }
+      }
+    }
+  }
+  &.dawn {
+    --black: #5c5c7e;
+    --white: #e5f2f5;
+    --accent: #6d6ac6;
+    --alt: #a589bb;
+    .spell {
+      .spell_inner {
+        ul.terms.large {
+          li {
+            background-color: var(--alt);
+            border-color: var(--alt);
+          }
+        }
+      }
+    }
+  }
+  &.abyss {
+    --black: #9affd9;
+    --white: #000;
+    --accent: #fffb00;
+    --alt: #6954ff;
+    --veil: rgba(0, 0, 0, 0.9);
     .spell {
       .spell_inner {
         ul.terms.large {
@@ -424,14 +508,14 @@ h3 {
       // }
     }
     .notes {
-      margin-top: .5rem;
+      margin-top: 0.5rem;
       width: 100%;
       padding: 0.5rem;
       border: 1px dashed var(--accent);
       textarea {
         width: 100%;
         resize: none;
-        font-size: .9rem;
+        font-size: 0.9rem;
         border-radius: 0;
         border: 1px solid var(--black);
       }
@@ -653,6 +737,8 @@ main {
           }
         }
         .header_right {
+          display: flex;
+          gap: 0.5rem;
           a {
             font-size: 1rem;
             text-decoration: none;
@@ -1109,7 +1195,8 @@ main {
               .spell {
                 .spell_inner {
                   .controls {
-                    .remove_spell, .note_spell {
+                    .remove_spell,
+                    .note_spell {
                       display: none;
                     }
                   }
@@ -1117,7 +1204,7 @@ main {
                     display: none;
                   }
                   .notes {
-                    display: none!important;
+                    display: none !important;
                   }
                   .higher-level {
                     display: none;
