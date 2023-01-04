@@ -39,11 +39,8 @@ You can help me by reporting bugs
 - Vorpalhex for the [spells database](https://github.com/vorpalhex/srd_spells) 
 
 ## Changelog
-*V0.0.1 "much beta"*
-- Initial publish/beta version
-
-*V0.0.2 "favorite beta"*
-- Added level indicators in PDF export
+*V0.0.4*
+- 
 
 *V0.0.3 "Swift Quiver"*
 - Bug fixes
@@ -53,6 +50,12 @@ You can help me by reporting bugs
 - PDF export fixed (now works across screen sizes/devices)
 - Bigger spell-control buttons on touch devices
 - Compacter layout on small screens
+
+*V0.0.2 "favorite beta"*
+- Added level indicators in PDF export
+
+*V0.0.1 "much beta"*
+- Initial publish/beta version
 
 ## Licensing 
 Open Game License v1.0a Copyright 2000, Wizards of the Coast, Inc.
