@@ -40,7 +40,9 @@ You can help me by reporting bugs
 
 ## Changelog
 *V0.0.7 "Shapechange"*
+- Bugfixes
 - Changes many anchor links to buttons where appropriate
+- Visual updates
 
 *V0.0.6 "Prestidigitation"*
 - Various bugfixes
