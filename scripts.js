@@ -26,7 +26,7 @@ let exportPdfButton = document.getElementById("export_pdf");
 let clearAllButton = document.getElementById("clear");
 let downloadButton = document.getElementById("download_button");
 let tempSpellContainer = document.getElementById("temp_spell");
-let filters = document.querySelectorAll("#filters .filter a");
+let filters = document.querySelectorAll("#filters .filter button");
 let filtersButton = document.getElementById("filters_button");
 let filtersButtonIcon = filtersButton.querySelector("i");
 let nameFilter = document.getElementById("name_filter");
@@ -60,6 +60,14 @@ function throttle(fn, wait) {
     }
   };
 }
+
+pageTitle.querySelector("a").addEventListener("click", (e) => {
+  event.preventDefault();
+  document.documentElement.setAttribute("data-scroll", window.scrollY);
+  var query = e.target.innerHTML;
+  var type = "temp";
+  fetchSpells(query, type);
+});
 
 /////////bind relevant buttons and links/////////////
 
@@ -373,7 +381,7 @@ function addToSheet(e, type, length) {
   }
   //
   spell.innerHTML =
-    '<div class="spell_inner"><div class="controls"><a href="#" class="note_spell"><span>Edit notes</span><i class="ri-draft-line"></i> </i></a><a href="#" class="favorite_spell"><span>Add to favorites</span><i class="ri-star-s-line"></i></a><a href="#" class="moveup_spell"><span>Move spell up</span><i class="ri-arrow-up-s-line"></i></a><a href="#" class="movedown_spell"><span>Move spell down</span><i class="ri-arrow-down-s-line"></i></a><a href="#" class="remove_spell"><span>Remove spell</span><i class="ri-close-line"></i></a></div><h3><i class="' +
+    '<div class="spell_inner"><div class="controls"><button type="button" class="note_spell"><span>Edit notes</span><i class="ri-draft-line"></i> </i></button><button type="button" class="favorite_spell"><span>Add to favorites</span><i class="ri-star-s-line"></i></button><button type="button" class="moveup_spell"><span>Move spell up</span><i class="ri-arrow-up-s-line"></i></button><button type="button" class="movedown_spell"><span>Move spell down</span><i class="ri-arrow-down-s-line"></i></button><button type="button" class="remove_spell"><span>Remove spell</span><i class="ri-close-line"></i></button></div><h3><i class="' +
     icon +
     '" title="' +
     e.school +
@@ -414,8 +422,16 @@ function addToSheet(e, type, length) {
     tempSpellContainer.parentElement.style.display = "block";
     document.body.style.position = "fixed";
     document.body.style.overflowY = "scroll";
-
-    spell.querySelector(".remove_spell").addEventListener("click", (e) => {
+    var closeButton = spell.querySelector(".remove_spell");
+    closeButton.addEventListener("click", (e) => {
+      closeTempSpell();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeTempSpell();
+      }
+    });
+    function closeTempSpell() {
       event.preventDefault();
       spell.remove();
       tempSpellContainer.parentElement.style.display = "none";
@@ -426,7 +442,7 @@ function addToSheet(e, type, length) {
       document.documentElement.style.scrollBehavior = "auto";
       window.scrollTo(0, savedScrollPosition);
       document.documentElement.style.scrollBehavior = "smooth";
-    });
+    }
   } else {
     if (!activeSpellsArray.includes(e.name)) {
       activeSpellsArray.push(e.name);
@@ -1029,18 +1045,18 @@ function saveSpellSheet() {
 exportPdfButton.addEventListener("click", () => {
   exportAsPDF();
 });
-  console.log(window.getComputedStyle(document.body).backgroundColor);
+console.log(window.getComputedStyle(document.body).backgroundColor);
 function exportAsPDF() {
   var blocker = document.createElement("div");
   blocker.className = "blocker";
   blocker.innerHTML = '<i class="ri-loader-4-line"></i>';
 
   blocker.style.backgroundColor = window.getComputedStyle(document.documentElement).backgroundColor;
-  blocker.querySelector('i').style.color = window.getComputedStyle(downloadButton).color;
+  blocker.querySelector("i").style.color = window.getComputedStyle(downloadButton).color;
   // blocker.style.backgroundColor = window.getComputedStyle(document.body).backgroundColor;
   window.blocker = blocker;
   document.documentElement.style.fontSize = "10px";
-  
+
   document.body.appendChild(blocker);
   window.pageNumber = 0;
   window.iterationCount = 0;

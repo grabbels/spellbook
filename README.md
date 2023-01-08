@@ -39,6 +39,9 @@ You can help me by reporting bugs
 - Vorpalhex for the [spells database](https://github.com/vorpalhex/srd_spells) 
 
 ## Changelog
+*V0.0.7 "Shapechange"*
+- Changes many anchor links to buttons where appropriate
+
 *V0.0.6 "Prestidigitation"*
 - Various bugfixes
 - Modernized themes

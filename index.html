@@ -17,11 +17,11 @@
   </head>
 
   <body>
-    <div id="disabled_message"><p>Most features are disabled while filters are active. <a class="remove-filters" href="#">Remove filters</a></div>
+    <div id="disabled_message"><p>Most features are disabled while filters are active. <button type="button" class="remove-filters">Remove filters</button></div>
     <main>
       <div class="outer_box" id="header">
         <div class="inner_box">
-          <a href="#" id="header_left_button"> <i class="ri-menu-2-line"></i> </a>
+          <button type="button" id="header_left_button"><i class="ri-menu-2-line"></i></button>
           <div class="header_left">
             <button id="download_button" class="disabled"><i class="ri-save-3-line"></i> Download</button>
             <button id="clear" class="disabled"><i class="ri-delete-bin-line"></i> Clear all</button>
@@ -36,7 +36,7 @@
             <div class="visual_prefs">
               <a class="menu_button" title="Report bugs" href="mailto:sem@semhak.com?subject=Spellbook bugs and suggestions"><i class="ri-bug-line"></i></a>
 
-              <a class="menu_button" id="visual_prefs_button" title="Visual preferences" href="#"><i class="ri-equalizer-line"></i></a>
+              <button type="button" class="menu_button" id="visual_prefs_button" title="Visual preferences"><i class="ri-equalizer-line"></i></button>
               <div id="visual_prefs_panel">
                 <ul>
                   <li>
@@ -65,7 +65,7 @@
       </div>
       <div class="outer_box" id="title">
         <div class="inner_box">
-          <h1 id="page_title"><i class="ri-quill-pen-line"></i> Inky's Tentacletastic Spellbook</h1><h5 style="text-align: center; font-weight: 500;">beta 0.0.6 "Prestidigitation"</h5>
+          <h1 id="page_title"><i class="ri-quill-pen-line"></i> Inky's Tentacletastic Spellbook</h1><h5 style="text-align: center; font-weight: 500;">beta 0.0.7 "<a href="#" class="spell_link">Shapechange</a>"</h5>
         </div>
       </div>
       <div class="outer_box" id="search">
@@ -84,30 +84,30 @@
             <li><h3>Filters</h3></li>
             <li class="filter" data-filter="time" title="Casting time">
               <i class="ri-flashlight-line"></i>
-              <a data-time="1 action" href="#">Action</a>
-              <a data-time="1 bonus action" href="#">Bonus</a>
-              <a data-time="1 reaction" href="#">Reaction</a>
+              <button type="button" data-time="1 action">Action</button>
+              <button type="button" data-time="1 bonus action">Bonus</button>
+              <button type="button" data-time="1 reaction">Reaction</button>
             </li>
             <li class="filter" data-filter="range" title="Range or target">
               <i class="ri-arrow-right-up-line"></i>
-              <a data-range="Self" href="#">Self</a>
-              <a data-range="Touch" href="#">Touch</a>
-              <a data-range="feet" href="#">Range</a>
+              <button type="button" data-range="Self">Self</a>
+              <button type="button" data-range="Touch">Touch</a>
+              <button type="button" data-range="feet">Range</a>
             </li>
             <li class="filter" data-filter="save" title="Saving throw">
               <i class="ri-lifebuoy-line"></i>
-              <a data-save="str" href="#">Str</a>
-              <a data-save="dex" href="#">Dex</a>
-              <a data-save="int" href="#">Int</a>
-              <a data-save="wis" href="#">Wis</a>
-              <a data-save="cha" href="#">Cha</a>
-              <a data-save="con" href="#">Con</a>
+              <button type="button" data-save="str">Str</button>
+              <button type="button" data-save="dex">Dex</button>
+              <button type="button" data-save="int">Int</button>
+              <button type="button" data-save="wis">Wis</button>
+              <button type="button" data-save="cha">Cha</button>
+              <button type="button" data-save="con">Con</button>
             </li>
             <li class="filter" data-filter="name">
               <input type="text" id="name_filter" placeholder="search in spellbook..." />
             </li>
             <li class="remove-filters">
-              <a href="#"><i class="ri-close-line"></i><span>Remove filters</span></a>
+              <button type="button"><i class="ri-close-line"></i><span>Remove filters</span></button>
             </li>
           </ul>
         </div>
@@ -173,7 +173,7 @@
 
           <div class="message" id="no_results_filtered">
             <p>You filtered all your spells away :(<br />They're very scared. Bring them back, quickly!</p>
-            <p><a class="remove-filters" href="#">Reset filters</a></p>
+            <p><button type="button" class="remove-filters">Reset filters</button></p>
           </div>
           <div class="message" id="no_spells">
             <p>Add some spells using the search box, or import your saved spellbook!</p>

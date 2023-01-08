@@ -52,6 +52,17 @@ html {
     &.modern {
       .spell {
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        .spell_inner {
+          .notes {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            background-color: #1f2429;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 1rem;
+            border: none;
+          }
+        }
       }
     }
   }
@@ -376,7 +387,7 @@ html {
         ul.filters {
           li {
             border-radius: 10px;
-            a:last-child {
+            button:last-child {
               border-radius: 0 10px 10px 0;
             }
           }
@@ -399,9 +410,9 @@ html {
   }
   &.print {
     .notes {
-      border-color: black!important;
+      border-color: black !important;
       p {
-        color: black!important;
+        color: black !important;
       }
     }
   }
@@ -414,6 +425,11 @@ html {
     opacity: 0.25;
     pointer-events: none;
   }
+}
+
+button {
+  all: unset;
+  cursor: pointer;
 }
 
 main {
@@ -450,6 +466,10 @@ footer {
 //       }
 //     }
 //   }
+// }
+
+// button {
+//   all: unset;
 // }
 
 h1,
@@ -505,8 +525,9 @@ h3 {
     padding: 0.25rem 0.6rem;
     color: var(--white);
     background-color: var(--black);
-    a {
+    button {
       color: var(--white);
+      text-decoration: underline;
     }
   }
 }
@@ -623,7 +644,7 @@ h3 {
     // &.disabled {
     //   opacity: 0;
     // }
-    a {
+    button {
       // width: 40px;
       // height: 40px;
       padding-left: 0.25rem;
@@ -743,9 +764,9 @@ h3 {
         color: var(--black);
       }
       button {
-        border: 1px solid var(--accent);
+        border: 1px solid var(--black);
         padding: 0.4rem 0.6rem;
-        height: 38px;
+        // height: 38px;
         background-color: var(--white);
         color: var(--black);
         cursor: pointer;
@@ -981,7 +1002,7 @@ main {
             border-radius: 0;
             display: inline-block;
             padding: 0.4rem 0.6rem;
-            height: 38px;
+            // height: 38px;
             background-color: var(--white);
             cursor: pointer;
             i {
@@ -1031,6 +1052,7 @@ main {
         .header_right {
           display: flex;
           gap: 0.5rem;
+          button,
           a {
             font-size: 1rem;
             text-decoration: none;
@@ -1062,7 +1084,8 @@ main {
                 li {
                   display: flex;
                   flex-wrap: nowrap;
-                  a {
+                  a,
+                  button {
                     display: block;
                     height: 40px;
                   }
@@ -1266,7 +1289,7 @@ main {
               vertical-align: -5px;
               color: var(--black);
             }
-            a {
+            button {
               padding: 0.435rem 0.6rem;
               display: inline-block;
               color: var(--black);
@@ -1292,18 +1315,25 @@ main {
               span {
                 display: none;
               }
-              a {
+              button {
                 height: 38px;
                 width: 38px;
                 padding: 0;
                 i {
                   font-size: 1.6rem;
-                  margin-left: 0.43rem;
+                  // margin-left: 0.43rem;
                 }
               }
               &.active {
                 width: 38px;
                 margin-right: 0.5rem;
+              }
+              &:hover {
+                button {
+                  i {
+                    color: var(--white);
+                  }
+                }
               }
             }
           }
@@ -1334,7 +1364,7 @@ main {
                 color: var(--white) !important;
               }
               &.filter {
-                a {
+                button {
                   &.active {
                     background-color: var(--white);
                     color: var(--black) !important;
@@ -1346,7 +1376,7 @@ main {
                 // left: 54px;
                 // top: 1px;
 
-                a {
+                button {
                   width: auto;
                   font-size: 0.9rem;
                   text-decoration: underline;
@@ -1359,7 +1389,7 @@ main {
                 }
                 &.active {
                   width: auto !important;
-                  a {
+                  button {
                     width: auto;
                   }
                 }
@@ -1446,6 +1476,9 @@ main {
           display: none;
           margin-top: 4rem;
           text-align: center;
+          button {
+            text-decoration: underline;
+          }
           &#no_spells {
             display: block;
           }
@@ -1538,7 +1571,7 @@ main {
             overflow: auto;
             .controls {
               display: block;
-              a {
+              button {
                 &.color_picker,
                 &.moveup_spell,
                 &.movedown_spell,
