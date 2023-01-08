@@ -16,6 +16,7 @@ let resultsContainer = document.getElementById("results");
 let loadingAnimation = document.getElementById("loading");
 let allSpellLists = document.getElementById("spellsheet_wrapper");
 let spellLists = document.querySelectorAll("ul.spells:not(.favorites)");
+let spellListTitles = document.querySelectorAll(".spellsheet_wrapper h2");
 let prefsButton = document.getElementById("visual_prefs_button");
 let prefsPanel = document.getElementById("visual_prefs_panel");
 let themeSelect = document.getElementById("theme_select");
@@ -49,6 +50,16 @@ let fromstorage = false;
 // const masterList = ''
 
 // const db = Dexie.import("spells.json");
+
+function throttle(fn, wait) {
+  var time = Date.now();
+  return function () {
+    if (time + wait - Date.now() < 0) {
+      fn();
+      time = Date.now();
+    }
+  };
+}
 
 /////////bind relevant buttons and links/////////////
 
@@ -681,6 +692,41 @@ function hideShowLevels() {
       bookmarksIcon.style.display = "block";
     }
   }
+  window.allVisibleLevels = Array.from(document.querySelectorAll(".spellsheet_wrapper h2")).filter((s) => window.getComputedStyle(s).getPropertyValue("display") != "none");
+}
+
+window.addEventListener("scroll", throttle(bookmarkInViewCheck, 10));
+var titleInView = "";
+function bookmarkInViewCheck() {
+  let thirdDocHeight = document.documentElement.clientHeight * 0.3;
+  let twoThirdDocHeight = document.documentElement.clientHeight * 0.6;
+  for (let i = 0; i < window.allVisibleLevels.length; i++) {
+    var titleTop = window.allVisibleLevels[i].getBoundingClientRect().top;
+    if (window.allVisibleLevels[i + 1]) {
+      var nextTitleTop = window.allVisibleLevels[i + 1].getBoundingClientRect().top;
+    }
+    if (window.scrollY === 0) {
+      //check if page is unscrolled to unset active bookmark
+      for (let i = 0; i < actualBookmarks.length; i++) {
+        actualBookmarks[i].classList.remove("active");
+      }
+    } else if (titleTop < twoThirdDocHeight && window.allVisibleLevels.slice(-1)[0] === window.allVisibleLevels[i]) {
+      //check if the target/visible level-section is the last visible one
+      setActiveBookmark();
+    } else if (titleTop < thirdDocHeight && !(titleTop < 0) && thirdDocHeight < nextTitleTop) {
+      setActiveBookmark();
+    }
+    function setActiveBookmark() {
+      var titleInView = window.allVisibleLevels[i];
+      if (registeredTitleInView !== titleInView) {
+        var registeredTitleInView = window.allVisibleLevels[i];
+        for (let i = 0; i < actualBookmarks.length; i++) {
+          actualBookmarks[i].classList.remove("active");
+        }
+        bookmarksBar.querySelector('div.bookmark[data-level="' + window.allVisibleLevels[i].getAttribute("data-level") + '"').classList.add("active");
+      }
+    }
+  }
 }
 
 searchBox.addEventListener("input", (e) => {
@@ -983,13 +1029,18 @@ function saveSpellSheet() {
 exportPdfButton.addEventListener("click", () => {
   exportAsPDF();
 });
-
+  console.log(window.getComputedStyle(document.body).backgroundColor);
 function exportAsPDF() {
   var blocker = document.createElement("div");
   blocker.className = "blocker";
   blocker.innerHTML = '<i class="ri-loader-4-line"></i>';
+
+  blocker.style.backgroundColor = window.getComputedStyle(document.documentElement).backgroundColor;
+  blocker.querySelector('i').style.color = window.getComputedStyle(downloadButton).color;
+  // blocker.style.backgroundColor = window.getComputedStyle(document.body).backgroundColor;
   window.blocker = blocker;
   document.documentElement.style.fontSize = "10px";
+  
   document.body.appendChild(blocker);
   window.pageNumber = 0;
   window.iterationCount = 0;
@@ -1044,6 +1095,8 @@ function exportAsPDF() {
         window.currentSpells = "";
         //
         setTimeout(() => {
+          window.setStyle = document.documentElement.classList;
+          document.documentElement.classList = "default print";
           html2pdffunction();
         }, 100);
       } else if (i === window.currentSpells.length - 1 && window.currentType === "favorite") {
@@ -1078,6 +1131,7 @@ function html2pdffunction() {
       window.printLayoutWindow.remove();
       window.blocker.remove();
       document.documentElement.style.fontSize = "16px";
+      document.documentElement.classList = themeSelect.value;
     });
 }
 

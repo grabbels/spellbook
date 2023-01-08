@@ -39,6 +39,15 @@ You can help me by reporting bugs
 - Vorpalhex for the [spells database](https://github.com/vorpalhex/srd_spells) 
 
 ## Changelog
+*V0.0.6 "Prestidigitation"*
+- Various bugfixes
+- Modernized themes
+
+*V0.0.5 "True Seeing"*
+- Various bugfixes
+- Added bookmark-locator for orientation
+- New color themes
+
 *V0.0.4 "Clairvoyance"*
 - Various bugfixes
 - Added spell property names on mouseover/touch

@@ -17,9 +17,24 @@
 html {
   scroll-behavior: smooth;
   background-color: var(--white);
+  &.default {
+    &.modern {
+      .spell {
+        .spell_inner {
+          ul.terms {
+            &.small {
+              li {
+                border: 1px solid var(--black);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
   &.moss {
     --black: #93a1a1;
-    --white: #0a0e12;
+    --white: #191e22;
     --accent: #946e1e;
     --alt: #629e72;
     --veil: rgba(0, 0, 0, 0.9);
@@ -34,6 +49,11 @@ html {
         }
       }
     }
+    &.modern {
+      .spell {
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+      }
+    }
   }
   &.solarized {
     // filter: invert(1) contrast(0.8);
@@ -42,6 +62,22 @@ html {
     --accent: #cb4b16;
     --alt: #eee8d5;
     --veil: rgba(0, 0, 0, 0.9);
+    scrollbar-color: darken(#93a1a1, 20%) var(--white);
+    scrollbar-width: thin;
+    ::-webkit-scrollbar {
+      background-color: var(--white);
+      width: 0.4rem;
+      padding-left: 0.2rem;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: darken(#93a1a1, 20%);
+      border-radius: 10px;
+    }
+    &.modern {
+      .spell {
+        border: 1px solid #586e75;
+      }
+    }
   }
   &.simple_dark {
     --black: #a1a1a1;
@@ -67,6 +103,44 @@ html {
         }
       }
     }
+    &.modern {
+      .spell {
+        background-color: var(--black) !important;
+        .controls,
+        span {
+          background-color: var(--black) !important;
+        }
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p,
+        a,
+        span {
+          color: var(--white) !important;
+        }
+        .spell_inner {
+          ul.terms {
+            &.large {
+              li {
+                background-color: var(--white) !important;
+                * {
+                  color: var(--black) !important;
+                }
+              }
+            }
+            &.small {
+              li {
+                background-color: var(--black) !important;
+                color: var(--white) !important;
+              }
+            }
+          }
+        }
+      }
+    }
   }
   &.mana {
     --black: #dfcdc2;
@@ -76,11 +150,37 @@ html {
     --veil: rgba(0, 0, 0, 0.9);
     .spell {
       .spell_inner {
-        ul.terms.large {
-          li,
-          .popup {
-            background-color: var(--alt);
-            border-color: var(--white);
+        ul.terms {
+          &.large {
+            li,
+            .popup {
+              background-color: var(--alt);
+              border-color: var(--white);
+            }
+          }
+        }
+      }
+    }
+    &.modern {
+      .spell {
+        background-color: #3d2475 !important;
+        .spell_inner {
+          ul.terms {
+            li {
+              border: none;
+              border-radius: 10px;
+            }
+            &.small {
+              li {
+                // background-color: #3d2475;
+              }
+            }
+          }
+        }
+        .controls {
+          background-color: #3d2475 !important;
+          span {
+            background-color: #3d2475 !important;
           }
         }
       }
@@ -91,7 +191,17 @@ html {
     --white: #ffd8d6;
     --accent: #86497a;
     --alt: #643542;
-
+    scrollbar-color: lighten(#3c2c2c, 45%) var(--white);
+    scrollbar-width: thin;
+    ::-webkit-scrollbar {
+      background-color: var(--white);
+      width: 0.4rem;
+      padding-left: 0.2rem;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: lighten(#3c2c2c, 45%);
+      border-radius: 10px;
+    }
     .spell {
       .spell_inner {
         ul.terms.large {
@@ -138,6 +248,15 @@ html {
         }
       }
     }
+    &.modern {
+      .spell {
+        background-color: #573e1f !important;
+        .controls,
+        span {
+          background-color: #573e1f !important;
+        }
+      }
+    }
   }
   &.oceandragon {
     --black: #dfcdc2;
@@ -156,6 +275,12 @@ html {
         }
       }
     }
+    &.modern {
+      .spell {
+        border: 1px solid var(--alt) !important;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4) !important;
+      }
+    }
   }
   &.dawn {
     --black: #5c5c7e;
@@ -170,6 +295,15 @@ html {
             background-color: var(--alt);
             border-color: var(--white);
           }
+        }
+      }
+    }
+    &.modern {
+      .spell {
+        // transition: box-shadow .1s;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15) !important;
+        &:hover {
+          // box-shadow: 0 12px 15px rgba(0, 0, 0, 0.22) !important;
         }
       }
     }
@@ -191,6 +325,18 @@ html {
         }
       }
     }
+    &.modern {
+      .spell {
+        border: 1px solid var(--black) !important;
+        .spell_inner {
+          ul.terms.small {
+            li {
+              border: 1px solid var(--black) !important;
+            }
+          }
+        }
+      }
+    }
   }
   &.curse {
     --black: #ebf2c5;
@@ -207,6 +353,55 @@ html {
             border-color: var(--white);
           }
         }
+      }
+    }
+    &.modern {
+      .spell {
+        border: 1px solid #3d2940;
+      }
+    }
+  }
+  &.modern {
+    #search {
+      .inner_box {
+        .search_wrapper {
+          input {
+            border-radius: 10px !important;
+          }
+        }
+      }
+    }
+    #filters {
+      .inner_box {
+        ul.filters {
+          li {
+            border-radius: 10px;
+            a:last-child {
+              border-radius: 0 10px 10px 0;
+            }
+          }
+        }
+      }
+    }
+    .spell {
+      border-radius: 10px;
+      border: none;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      .spell_inner {
+        .terms {
+          li {
+            border-radius: 10px;
+            border: none;
+          }
+        }
+      }
+    }
+  }
+  &.print {
+    .notes {
+      border-color: black!important;
+      p {
+        color: black!important;
       }
     }
   }
@@ -1418,6 +1613,15 @@ main {
                 }
               }
             }
+            &.active {
+              .bookmark_inner {
+                background-color: var(--accent);
+                p,
+                i {
+                  color: var(--white);
+                }
+              }
+            }
             &.icon {
               @media only screen and (max-width: 1024px) {
                 // border: 1px solid var(--black)
@@ -1466,9 +1670,9 @@ main {
             }
             &:hover:not(.icon) {
               .bookmark_inner {
-                background-color: var(--accent);
-                p {
-                  color: var(--white);
+                // background-color: var(--accent);
+                border: 1px solid var(--accent) p {
+                  // color: var(--white);
                 }
               }
             }
