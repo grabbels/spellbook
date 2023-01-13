@@ -1,15 +1,3 @@
-// let filePath = "./spells.json";
-// let arrayImport = await import(filePath, {
-//   assert: { type: "json" },
-// });
-// const masterList = masterList.default;
-
-// const names = [];
-// fetch("../spells.json")
-//   .then((res) => res.json())
-//   .then((data) => {
-//     let results = data.filter((x) => x.name.toLowerCase().includes("wate".toLowerCase()));
-//   });
 let searchBox = document.getElementById("spellsearch");
 let spellsLoading = document.getElementById("spells_loading");
 let resultsContainer = document.getElementById("results");
