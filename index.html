@@ -13,23 +13,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
     <link type="text/css" rel="stylesheet" href="compiled/css/style.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+      integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
   </head>
 
   <body>
-    <div id="disabled_message"><p>Most features are disabled while filters are active. <button type="button" class="remove-filters">Remove filters</button></div>
+    <div id="disabled_message">
+      <p>Most features are disabled while filters are active. <button type="button" class="remove-filters">Remove filters</button></p>
+    </div>
     <main>
       <div class="outer_box" id="header">
         <div class="inner_box">
           <button type="button" id="header_left_button"><i class="ri-menu-2-line"></i></button>
           <div class="header_left">
+            <button id="login"><i class="ri-user-3-line"></i> Login</button>
             <button id="download_button" class="disabled"><i class="ri-save-3-line"></i> Download</button>
             <button id="clear" class="disabled"><i class="ri-delete-bin-line"></i> Clear all</button>
             <label for="input-file" tabindex="0">
               <i class="ri-folder-open-line"></i> Import
               <input type="file" id="input-file" style="display: none" accept=".json" />
             </label>
-            <button id="export_pdf" class="disabled"> <i class="ri-file-list-2-line"></i> Export PDF</button>
+            <button id="export_pdf" class="disabled"><i class="ri-file-list-2-line"></i> Export PDF</button>
             <!-- <p>Disable filters to enable all features again</p> -->
           </div>
           <div class="header_right">
@@ -65,7 +74,8 @@
       </div>
       <div class="outer_box" id="title">
         <div class="inner_box">
-          <h1 id="page_title"><i class="ri-quill-pen-line"></i> Inky's Tentacletastic Spellbook</h1><h5 style="text-align: center; font-weight: 500;">beta 0.0.7 "<a href="#" class="spell_link">Shapechange</a>"</h5>
+          <h1 id="page_title"><i class="ri-quill-pen-line"></i> Inky's Tentacletastic Spellbook</h1>
+          <h5 style="text-align: center; font-weight: 500">beta 0.0.7 "<a href="#" class="spell_link">Shapechange</a>"</h5>
         </div>
       </div>
       <div class="outer_box" id="search">
@@ -126,7 +136,7 @@
         <div class="inner_box">
           <div class="spellsheet_wrapper" id="spellsheet_wrapper">
             <div id="favorites">
-              <h2 data-level="favorites"><i class="ri-star-s-line"></i> Favorites <span style="font-size: 1rem; opacity: .5">click/double-tap for details</span></h2>
+              <h2 data-level="favorites"><i class="ri-star-s-line"></i> Favorites <span style="font-size: 1rem; opacity: 0.5">click/double-tap for details</span></h2>
               <ul class="spells favorites" data-level="favorites"></ul>
             </div>
             <div id="0">
@@ -180,8 +190,46 @@
           </div>
         </div>
 
-        <div class="temp_spell_wrapper">
-          <div id="temp_spell"></div>
+        <div class="cloak">
+          <div style="display: none" id="temp_spell"></div>
+          <div style="display: none" id="loginmodal">
+            <div class="spell shown modal">
+              <div class="spell_inner">
+                <div class="controls">
+                  <button type="button" class="remove_spell"><span>Remove spell</span><i class="ri-close-line"></i></button>
+                </div>
+                <h3>Login/Register</h3>
+                <p>Use the form below to login or register to sync your spellsheets across devices and manage several at a time!</p><br>
+                <form class="login" id="loginregisterform" onsubmit="registerLoginUser()">
+                  <div class="container">
+                    <h1 class="registerelement">Register</h1>
+                    <p class="registerelement">Please fill in this form to create an account.</p>
+                    <h1 class="loginelement">Login</h1>
+                    <hr />
+                    <label for="email"><b>Email</b></label>
+                    <input type="text" placeholder="Enter Email" type="email" name="email" id="email" required />
+
+                    <label for="psw"><b>Password</b></label>
+                    <input type="password" placeholder="Enter Password" name="psw" id="psw" required />
+
+                    <label class="registerelement" for="psw-repeat"><b>Repeat Password</b></label>
+                    <input class="registerelement" type="password" placeholder="Repeat Password" name="psw-repeat" id="psw-repeat"/>
+                    <hr />
+                    <p class="registerelement">By creating an account you agree to our <a href="#">Terms & Privacy</a>.</p>
+                    <button type="submit" class="registerelement" id="registerbtn">Register</button>
+                    <button type="submit" class="loginelement" id="loginbtn">Login</button>
+                  </div>
+
+                  <div class="container registerelement">
+                    <p>Already have an account? <a href="#" id="switchtosignin">Sign in</a>.</p>
+                  </div>
+                  <div class="container loginelement">
+                    <p>No account yet? <a href="#" id="switchtoregister">Create one</a>.</p>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
         <div id="bookmarks">
           <div class="bookmarks_wrapper">
@@ -192,7 +240,9 @@
             </div>
             <div class="actual_bookmarks">
               <div data-level="favorites" class="bookmark">
-                <a href="#favorites" data-level="favorites" class="bookmark_inner"><p><i class="ri-star-line"></i></p></a>
+                <a href="#favorites" data-level="favorites" class="bookmark_inner"
+                  ><p><i class="ri-star-line"></i></p
+                ></a>
               </div>
               <div data-level="0" class="bookmark">
                 <a href="#0" data-level="0" class="bookmark_inner"><p>C</p></a>
@@ -230,6 +280,7 @@
       </div>
     </main>
     <script type="module" src="scripts.js"></script>
+    <script type="module" src="auth.js"></script>
   </body>
   <footer style="margin-top: 4rem; padding-bottom: 2rem">
     <p style="text-align: center; font-size: 0.8rem">

@@ -406,6 +406,7 @@ function addToSheet(e, type, length) {
   }
   //
   if (type === "temp") {
+    tempSpellContainer.style.display = "flex";
     tempSpellContainer.appendChild(spell);
     tempSpellContainer.parentElement.style.display = "block";
     document.body.style.position = "fixed";
@@ -422,6 +423,7 @@ function addToSheet(e, type, length) {
     function closeTempSpell() {
       event.preventDefault();
       spell.remove();
+      tempSpellContainer.style.display = "none";
       tempSpellContainer.parentElement.style.display = "none";
       document.body.style.position = "static";
       document.body.style.overflowY = "auto";
